@@ -1,0 +1,23 @@
+package qst
+
+import "net/http"
+
+{{- range $capitalizedMethod := . -}}
+{{- $method := $capitalizedMethod | lower | title }}
+
+// New{{ $method }} builds a new *http.Request with method {{ $capitalizedMethod }}.
+func New{{ $method }}(url string, options ...Option) (*http.Request, error) {
+    return New(http.Method{{ $method }}, url, options...)
+}
+
+// {{ $method }} makes a {{ $capitalizedMethod }} request using the current DefaultClient and returns the *http.Response.
+func {{ $method }}(url string, options ...Option) (*http.Response, error) {
+    return Do(http.Method{{ $method }}, url, options...)
+}
+
+// {{ $method }} makes a {{ $capitalizedMethod }} request and returns the *http.Response using the Doer assigned to c.
+func (c *Client) {{ $method }}(url string, options ...Option) (*http.Response, error) {
+    return c.Do(http.Method{{ $method }}, url, options...)
+}
+
+{{- end }}
