@@ -39,12 +39,12 @@ response, err := qst.Patch("http://example.com",     // Send PATCH request
 
 The options pattern allows for easily defining commonly used options:
 ```go
-func query(before time.Time) qst.Option {
-    return qst.QueryValue("created_at", fmt.Sprintf(">=%s", before.Format(time.RFC3339)))
+func createdAfter(after time.Time) qst.Option {
+    return qst.QueryValue("created_at", fmt.Sprintf(">=%s", after.Format(time.RFC3339)))
 }
 
-func makeCall(before time.Time) {
-    response, err := qst.Get("http://example.com", query(before))
+func main() {
+    response, err := qst.Get("http://example.com", createdAfter(time.Now().Add(-24 * time.Hour)))
 }
 ```
 
