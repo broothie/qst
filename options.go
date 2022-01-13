@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,6 +21,7 @@ type Option interface {
 // Pipeline is a collection of options, which can be applied as a whole.
 type Pipeline []Option
 
+// Apply applies the Pipeline to the *http.Request.
 func (p Pipeline) Apply(request *http.Request) (*http.Request, error) {
 	for _, option := range p {
 		var err error
@@ -32,9 +34,10 @@ func (p Pipeline) Apply(request *http.Request) (*http.Request, error) {
 	return request, nil
 }
 
-// OptionFunc is a function form of an Option.
+// OptionFunc is a function form of Option.
 type OptionFunc func(request *http.Request) (*http.Request, error)
 
+// Apply applies the OptionFunc to the *http.Request.
 func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return f(request) }
 
 // QueryValue applies a key/value pair to the query parameters of the *http.Request.
@@ -51,6 +54,7 @@ func QueryValue(key, value string) Option {
 // Query applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
 type Query url.Values
 
+// Apply applies the Query to the *http.Request.
 func (q Query) Apply(request *http.Request) (*http.Request, error) {
 	options := make(Pipeline, 0, len(q))
 	for key, values := range q {
@@ -70,9 +74,10 @@ func Header(key, value string) Option {
 	})
 }
 
-// Header applies multiple key/value pairs to the headers of the *http.Request. It wraps http.Header.
+// Headers applies multiple key/value pairs to the headers of the *http.Request. It wraps http.Header.
 type Headers http.Header
 
+// Apply applies the Headers to the *http.Request.
 func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 	options := make(Pipeline, 0, len(h))
 	for key, values := range h {
@@ -119,17 +124,18 @@ func Body(body io.ReadCloser) Option {
 
 // BodyBytes applies a slice of bytes to the *http.Request body.
 func BodyBytes(body []byte) Option {
-	return Body(io.NopCloser(bytes.NewBuffer(body)))
+	return Body(ioutil.NopCloser(bytes.NewBuffer(body)))
 }
 
 // BodyString applies a string to the *http.Request body.
 func BodyString(body string) Option {
-	return Body(io.NopCloser(strings.NewReader(body)))
+	return Body(ioutil.NopCloser(strings.NewReader(body)))
 }
 
 // BodyForm URL-encodes multiple key/value pairs and applies the result to the *http.Request body.
 type BodyForm url.Values
 
+// Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
 	return Pipeline{
 		Header("Content-Type", "application/x-www-form-urlencoded"),
@@ -147,7 +153,7 @@ func BodyJSON(v interface{}) Option {
 
 		return Pipeline{
 			Header("Content-Type", "application/json"),
-			Body(io.NopCloser(body)),
+			Body(ioutil.NopCloser(body)),
 		}.Apply(request)
 	})
 }
@@ -162,7 +168,7 @@ func BodyXML(v interface{}) Option {
 
 		return Pipeline{
 			Header("Content-Type", "application/xml"),
-			Body(io.NopCloser(body)),
+			Body(ioutil.NopCloser(body)),
 		}.Apply(request)
 	})
 }

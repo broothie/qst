@@ -2,7 +2,7 @@ package qst
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +30,7 @@ func ExampleNew() {
 		BodyJSON(map[string]string{"key": "value"}),
 	)
 
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 
 	fmt.Println(req.Method)
 	fmt.Println(req.URL)
@@ -46,7 +46,7 @@ func ExampleDo() {
 	// {"key":"value"}
 
 	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
-		body, _ := io.ReadAll(req.Body)
+		body, _ := ioutil.ReadAll(req.Body)
 
 		fmt.Println(req.Method)
 		fmt.Println(req.URL)

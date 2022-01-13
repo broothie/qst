@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,10 +22,13 @@ func TestOptions(t *testing.T) {
 	})
 
 	t.Run("Context", func(t *testing.T) {
-		request, err := NewPost("", Context(context.WithValue(context.TODO(), "something", "here")))
+		type keyType struct{}
+		var key keyType
+
+		request, err := NewPost("", Context(context.WithValue(context.TODO(), key, "here")))
 		assert.NoError(t, err)
 
-		assert.Equal(t, "here", request.Context().Value("something"))
+		assert.Equal(t, "here", request.Context().Value(key))
 	})
 }
 
@@ -72,43 +75,43 @@ func ExampleBearer() {
 }
 
 func ExampleBody() {
-	req, _ := NewPost("http://httpbin.org/post", Body(io.NopCloser(bytes.NewBufferString("something"))))
-	body, _ := io.ReadAll(req.Body)
+	req, _ := NewPost("http://httpbin.org/post", Body(ioutil.NopCloser(bytes.NewBufferString("something"))))
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: something
 }
 
 func ExampleBodyBytes() {
 	req, _ := NewPost("http://httpbin.org/post", BodyBytes([]byte("something")))
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: something
 }
 
 func ExampleBodyString() {
 	req, _ := NewPost("http://httpbin.org/post", BodyString("something"))
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: something
 }
 
 func ExampleBodyForm() {
 	req, _ := NewPost("http://httpbin.org/post", BodyForm{"something": {"here"}})
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: something=here
 }
 
 func ExampleBodyJSON() {
 	req, _ := NewPost("http://httpbin.org/post", BodyJSON(map[string]interface{}{"something": "here"}))
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: {"something":"here"}
 }
 
 func ExampleBodyXML() {
 	req, _ := NewPost("http://httpbin.org/post", BodyXML("something"))
-	body, _ := io.ReadAll(req.Body)
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
 	// Output: <string>something</string>
 }
