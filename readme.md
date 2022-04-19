@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/broothie/qst.svg)](https://pkg.go.dev/github.com/broothie/qst)
 [![Go Report Card](https://goreportcard.com/badge/github.com/broothie/qst)](https://goreportcard.com/report/github.com/broothie/qst)
+[![codecov](https://codecov.io/gh/broothie/qst/branch/main/graph/badge.svg?token=CVMUN8Y9FV)](https://codecov.io/gh/broothie/qst)
 
 `qst` is an `*http.Request` builder. "qst" is short for "quest", which is part of the word "request".
 
