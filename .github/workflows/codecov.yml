@@ -12,5 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - run: go test ./... -coverprofile cover.out
+
       - name: Codecov
         uses: codecov/codecov-action@v3.0.0
+        with:
+          files: cover.out
