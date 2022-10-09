@@ -89,6 +89,14 @@ func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 	return options.Apply(request)
 }
 
+// Cookie applies a cookie to the *http.Request
+func Cookie(cookie *http.Cookie) OptionFunc {
+	return func(request *http.Request) (*http.Request, error) {
+		request.AddCookie(cookie)
+		return request, nil
+	}
+}
+
 // Authorization applies an "Authorization" header to the *http.Request.
 func Authorization(authorization string) Option {
 	return Header("Authorization", authorization)

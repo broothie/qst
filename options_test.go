@@ -5,7 +5,9 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -54,6 +56,18 @@ func ExampleHeaders() {
 	req, _ := NewGet("http://httpbin.org/get", Headers{"X-Trace-Id": {"asdf"}})
 	fmt.Println(req.Header.Get("x-trace-id"))
 	// Output: asdf
+}
+
+func ExampleCookie() {
+	req, _ := NewGet("http://httpbin.org/get", Cookie(&http.Cookie{
+		Name:    "some-cookie",
+		Value:   "some-value",
+		Path:    "/",
+		Expires: time.Now().Add(time.Hour),
+	}))
+
+	fmt.Println(req.Cookie("some-cookie"))
+	// Output: some-cookie=some-value <nil>
 }
 
 func ExampleAuthorization() {
