@@ -88,6 +88,12 @@ func ExampleBearer() {
 	// Output: Bearer some-token
 }
 
+func ExampleContextValue() {
+	req, _ := NewGet("http://httpbin.org/get", ContextValue("key", "value"))
+	fmt.Println(req.Context().Value("key"))
+	// Output: value
+}
+
 func ExampleBody() {
 	req, _ := NewPost("http://httpbin.org/post", Body(ioutil.NopCloser(bytes.NewBufferString("something"))))
 	body, _ := ioutil.ReadAll(req.Body)

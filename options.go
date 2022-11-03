@@ -122,6 +122,13 @@ func Context(ctx context.Context) Option {
 	})
 }
 
+// ContextValue applies a context key/value pair to the *http.Request.
+func ContextValue(key, value interface{}) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		return request.WithContext(context.WithValue(request.Context(), key, value)), nil
+	})
+}
+
 // Body applies a io.ReadCloser to the *http.Request body.
 func Body(body io.ReadCloser) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
