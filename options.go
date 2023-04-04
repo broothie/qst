@@ -7,10 +7,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 // Option is an option for building *http.Requests.
@@ -90,11 +88,11 @@ func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 }
 
 // Cookie applies a cookie to the *http.Request
-func Cookie(cookie *http.Cookie) OptionFunc {
-	return func(request *http.Request) (*http.Request, error) {
+func Cookie(cookie *http.Cookie) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.AddCookie(cookie)
 		return request, nil
-	}
+	})
 }
 
 // Authorization applies an "Authorization" header to the *http.Request.
@@ -137,14 +135,18 @@ func Body(body io.ReadCloser) Option {
 	})
 }
 
+func BodyReader(body io.Reader) Option {
+	return Body(io.NopCloser(body))
+}
+
 // BodyBytes applies a slice of bytes to the *http.Request body.
 func BodyBytes(body []byte) Option {
-	return Body(ioutil.NopCloser(bytes.NewBuffer(body)))
+	return BodyReader(bytes.NewBuffer(body))
 }
 
 // BodyString applies a string to the *http.Request body.
 func BodyString(body string) Option {
-	return Body(ioutil.NopCloser(strings.NewReader(body)))
+	return BodyBytes([]byte(body))
 }
 
 // BodyForm URL-encodes multiple key/value pairs and applies the result to the *http.Request body.
@@ -168,7 +170,7 @@ func BodyJSON(v interface{}) Option {
 
 		return Pipeline{
 			Header("Content-Type", "application/json"),
-			Body(ioutil.NopCloser(body)),
+			BodyReader(body),
 		}.Apply(request)
 	})
 }
@@ -183,7 +185,7 @@ func BodyXML(v interface{}) Option {
 
 		return Pipeline{
 			Header("Content-Type", "application/xml"),
-			Body(ioutil.NopCloser(body)),
+			BodyReader(body),
 		}.Apply(request)
 	})
 }
