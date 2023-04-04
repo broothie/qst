@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 )
 
 // Option is an option for building *http.Requests.
@@ -37,6 +38,21 @@ type OptionFunc func(request *http.Request) (*http.Request, error)
 
 // Apply applies the OptionFunc to the *http.Request.
 func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return f(request) }
+
+// Apply applies the Options to the *http.Request
+func Apply(request *http.Request, options ...Option) (*http.Request, error) {
+	return Pipeline(options).Apply(request)
+}
+
+func Path(segments ...string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		elem := []string{request.URL.Path}
+		elem = append(elem, segments...)
+		request.URL.Path = path.Join(elem...)
+
+		return request, nil
+	})
+}
 
 // QueryValue applies a key/value pair to the query parameters of the *http.Request.
 func QueryValue(key, value string) Option {
@@ -154,10 +170,10 @@ type BodyForm url.Values
 
 // Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
-	return Pipeline{
+	return Apply(request,
 		Header("Content-Type", "application/x-www-form-urlencoded"),
 		BodyString(url.Values(f).Encode()),
-	}.Apply(request)
+	)
 }
 
 // BodyJSON encodes an object as JSON and applies it to the *http.Request body.
@@ -168,10 +184,10 @@ func BodyJSON(v interface{}) Option {
 			return nil, err
 		}
 
-		return Pipeline{
+		return Apply(request,
 			Header("Content-Type", "application/json"),
 			BodyReader(body),
-		}.Apply(request)
+		)
 	})
 }
 
@@ -183,9 +199,9 @@ func BodyXML(v interface{}) Option {
 			return nil, err
 		}
 
-		return Pipeline{
+		return Apply(request,
 			Header("Content-Type", "application/xml"),
 			BodyReader(body),
-		}.Apply(request)
+		)
 	})
 }

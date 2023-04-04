@@ -21,47 +21,47 @@ func TestMethods(t *testing.T) {
 		http.MethodGet: {
 			new:      NewGet,
 			do:       Get,
-			clientDo: WithClient(client).Get,
+			clientDo: NewClient(client).Get,
 		},
 		http.MethodHead: {
 			new:      NewHead,
 			do:       Head,
-			clientDo: WithClient(client).Head,
+			clientDo: NewClient(client).Head,
 		},
 		http.MethodPost: {
 			new:      NewPost,
 			do:       Post,
-			clientDo: WithClient(client).Post,
+			clientDo: NewClient(client).Post,
 		},
 		http.MethodPut: {
 			new:      NewPut,
 			do:       Put,
-			clientDo: WithClient(client).Put,
+			clientDo: NewClient(client).Put,
 		},
 		http.MethodPatch: {
 			new:      NewPatch,
 			do:       Patch,
-			clientDo: WithClient(client).Patch,
+			clientDo: NewClient(client).Patch,
 		},
 		http.MethodDelete: {
 			new:      NewDelete,
 			do:       Delete,
-			clientDo: WithClient(client).Delete,
+			clientDo: NewClient(client).Delete,
 		},
 		http.MethodConnect: {
 			new:      NewConnect,
 			do:       Connect,
-			clientDo: WithClient(client).Connect,
+			clientDo: NewClient(client).Connect,
 		},
 		http.MethodOptions: {
 			new:      NewOptions,
 			do:       Options,
-			clientDo: WithClient(client).Options,
+			clientDo: NewClient(client).Options,
 		},
 		http.MethodTrace: {
 			new:      NewTrace,
 			do:       Trace,
-			clientDo: WithClient(client).Trace,
+			clientDo: NewClient(client).Trace,
 		},
 	}
 

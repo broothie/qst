@@ -9,7 +9,7 @@ func New(method, url string, options ...Option) (*http.Request, error) {
 		return nil, err
 	}
 
-	return Pipeline(options).Apply(request)
+	return Apply(request, options...)
 }
 
 // Do makes a *http.Request using the current DefaultClient and returns the *http.Response.

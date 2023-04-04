@@ -40,6 +40,12 @@ func ExampleQueryValue() {
 	// Output: page=10
 }
 
+func ExamplePath() {
+	req, _ := NewGet("http://httpbin.org/get", Path("to", "some", "resource"))
+	fmt.Println(req.URL.Path)
+	// Output: /get/to/some/resource
+}
+
 func ExampleQuery() {
 	req, _ := NewGet("http://httpbin.org/get", Query{"page": {"10"}, "count": {"50"}})
 	fmt.Println(req.URL.Query().Encode())
