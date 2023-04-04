@@ -23,7 +23,12 @@ func TestSmoke(t *testing.T) {
 		defer server.Close()
 
 		// Exercise
-		_, err := qst.Post(server.URL, qst.BearerAuth("asdf"), qst.Header("something", "here"))
+		_, err := qst.Post(
+			qst.URL(server.URL),
+			qst.BearerAuth("asdf"),
+			qst.Header("something", "here"),
+		)
+
 		require.NoError(t, err)
 	})
 
@@ -43,7 +48,8 @@ func TestSmoke(t *testing.T) {
 		defer server.Close()
 
 		// Exercise
-		_, err := qst.Post(server.URL,
+		_, err := qst.Post(
+			qst.URL(server.URL),
 			qst.BearerAuth("asdf"),
 			qst.BodyJSON(map[string]interface{}{"something": "here", "a": 1}),
 		)

@@ -10,18 +10,18 @@ import (
 )
 
 func TestClient_Do(t *testing.T) {
-	_, err := NewClient(http.DefaultClient).Do("lol what", "")
+	_, err := NewClient(http.DefaultClient).Do("lol what")
 	assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 }
 
 func ExampleNewClient() {
-	client := NewClient(http.DefaultClient, BearerAuth("asdf"))
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.Header.Get("Authorization"))
 		fmt.Println(r.URL.RawQuery)
 	}))
 
-	client.Get(server.URL, QueryValue("page", "10"))
+	client := NewClient(http.DefaultClient, URL(server.URL), BearerAuth("asdf"))
+	client.Get(Query("page", "10"))
 	// Output: Bearer asdf
 	// page=10
 }

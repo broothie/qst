@@ -3,136 +3,136 @@ package qst
 import "net/http"
 
 // NewGet builds a new *http.Request with method GET.
-func NewGet(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodGet, url, options...)
+func NewGet(options ...Option) (*http.Request, error) {
+    return New(http.MethodGet, options...)
 }
 
 // Get makes a GET request using the current DefaultClient and returns the *http.Response.
-func Get(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodGet, url, options...)
+func Get(options ...Option) (*http.Response, error) {
+    return Do(http.MethodGet, options...)
 }
 
 // Get makes a GET request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Get(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodGet, url, options...)
+func (c *Client) Get(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodGet, options...)
 }
 
 // NewHead builds a new *http.Request with method HEAD.
-func NewHead(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodHead, url, options...)
+func NewHead(options ...Option) (*http.Request, error) {
+    return New(http.MethodHead, options...)
 }
 
 // Head makes a HEAD request using the current DefaultClient and returns the *http.Response.
-func Head(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodHead, url, options...)
+func Head(options ...Option) (*http.Response, error) {
+    return Do(http.MethodHead, options...)
 }
 
 // Head makes a HEAD request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Head(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodHead, url, options...)
+func (c *Client) Head(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodHead, options...)
 }
 
 // NewPost builds a new *http.Request with method POST.
-func NewPost(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodPost, url, options...)
+func NewPost(options ...Option) (*http.Request, error) {
+    return New(http.MethodPost, options...)
 }
 
 // Post makes a POST request using the current DefaultClient and returns the *http.Response.
-func Post(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodPost, url, options...)
+func Post(options ...Option) (*http.Response, error) {
+    return Do(http.MethodPost, options...)
 }
 
 // Post makes a POST request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Post(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodPost, url, options...)
+func (c *Client) Post(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodPost, options...)
 }
 
 // NewPut builds a new *http.Request with method PUT.
-func NewPut(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodPut, url, options...)
+func NewPut(options ...Option) (*http.Request, error) {
+    return New(http.MethodPut, options...)
 }
 
 // Put makes a PUT request using the current DefaultClient and returns the *http.Response.
-func Put(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodPut, url, options...)
+func Put(options ...Option) (*http.Response, error) {
+    return Do(http.MethodPut, options...)
 }
 
 // Put makes a PUT request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Put(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodPut, url, options...)
+func (c *Client) Put(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodPut, options...)
 }
 
 // NewPatch builds a new *http.Request with method PATCH.
-func NewPatch(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodPatch, url, options...)
+func NewPatch(options ...Option) (*http.Request, error) {
+    return New(http.MethodPatch, options...)
 }
 
 // Patch makes a PATCH request using the current DefaultClient and returns the *http.Response.
-func Patch(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodPatch, url, options...)
+func Patch(options ...Option) (*http.Response, error) {
+    return Do(http.MethodPatch, options...)
 }
 
 // Patch makes a PATCH request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Patch(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodPatch, url, options...)
+func (c *Client) Patch(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodPatch, options...)
 }
 
 // NewDelete builds a new *http.Request with method DELETE.
-func NewDelete(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodDelete, url, options...)
+func NewDelete(options ...Option) (*http.Request, error) {
+    return New(http.MethodDelete, options...)
 }
 
 // Delete makes a DELETE request using the current DefaultClient and returns the *http.Response.
-func Delete(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodDelete, url, options...)
+func Delete(options ...Option) (*http.Response, error) {
+    return Do(http.MethodDelete, options...)
 }
 
 // Delete makes a DELETE request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Delete(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodDelete, url, options...)
+func (c *Client) Delete(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodDelete, options...)
 }
 
 // NewConnect builds a new *http.Request with method CONNECT.
-func NewConnect(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodConnect, url, options...)
+func NewConnect(options ...Option) (*http.Request, error) {
+    return New(http.MethodConnect, options...)
 }
 
 // Connect makes a CONNECT request using the current DefaultClient and returns the *http.Response.
-func Connect(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodConnect, url, options...)
+func Connect(options ...Option) (*http.Response, error) {
+    return Do(http.MethodConnect, options...)
 }
 
 // Connect makes a CONNECT request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Connect(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodConnect, url, options...)
+func (c *Client) Connect(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodConnect, options...)
 }
 
 // NewOptions builds a new *http.Request with method OPTIONS.
-func NewOptions(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodOptions, url, options...)
+func NewOptions(options ...Option) (*http.Request, error) {
+    return New(http.MethodOptions, options...)
 }
 
 // Options makes a OPTIONS request using the current DefaultClient and returns the *http.Response.
-func Options(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodOptions, url, options...)
+func Options(options ...Option) (*http.Response, error) {
+    return Do(http.MethodOptions, options...)
 }
 
 // Options makes a OPTIONS request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Options(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodOptions, url, options...)
+func (c *Client) Options(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodOptions, options...)
 }
 
 // NewTrace builds a new *http.Request with method TRACE.
-func NewTrace(url string, options ...Option) (*http.Request, error) {
-    return New(http.MethodTrace, url, options...)
+func NewTrace(options ...Option) (*http.Request, error) {
+    return New(http.MethodTrace, options...)
 }
 
 // Trace makes a TRACE request using the current DefaultClient and returns the *http.Response.
-func Trace(url string, options ...Option) (*http.Response, error) {
-    return Do(http.MethodTrace, url, options...)
+func Trace(options ...Option) (*http.Response, error) {
+    return Do(http.MethodTrace, options...)
 }
 
 // Trace makes a TRACE request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Trace(url string, options ...Option) (*http.Response, error) {
-    return c.Do(http.MethodTrace, url, options...)
+func (c *Client) Trace(options ...Option) (*http.Response, error) {
+    return c.Do(http.MethodTrace, options...)
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
+	neturl "net/url"
 	"path"
 )
 
@@ -44,6 +44,50 @@ func Apply(request *http.Request, options ...Option) (*http.Request, error) {
 	return Pipeline(options).Apply(request)
 }
 
+func RawURL(url *neturl.URL) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL = url
+		return request, nil
+	})
+}
+
+func URL(url string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		u, err := neturl.Parse(url)
+		if err != nil {
+			return nil, err
+		}
+
+		return RawURL(u).Apply(request)
+	})
+}
+
+func Scheme(scheme string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL.Scheme = scheme
+		return request, nil
+	})
+}
+
+func User(user *neturl.Userinfo) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL.User = user
+		return request, nil
+	})
+}
+
+func UserPassword(username, password string) Option {
+	return User(neturl.UserPassword(username, password))
+}
+
+func Host(host string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.Host = host
+		request.URL.Host = host
+		return request, nil
+	})
+}
+
 func Path(segments ...string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		elem := []string{request.URL.Path}
@@ -54,8 +98,8 @@ func Path(segments ...string) Option {
 	})
 }
 
-// QueryValue applies a key/value pair to the query parameters of the *http.Request.
-func QueryValue(key, value string) Option {
+// Query applies a key/value pair to the query parameters of the *http.Request.
+func Query(key, value string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		query := request.URL.Query()
 		query.Add(key, value)
@@ -65,15 +109,15 @@ func QueryValue(key, value string) Option {
 	})
 }
 
-// Query applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
-type Query url.Values
+// Queries applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
+type Queries neturl.Values
 
-// Apply applies the Query to the *http.Request.
-func (q Query) Apply(request *http.Request) (*http.Request, error) {
+// Apply applies the Queries to the *http.Request.
+func (q Queries) Apply(request *http.Request) (*http.Request, error) {
 	options := make(Pipeline, 0, len(q))
 	for key, values := range q {
 		for _, value := range values {
-			options = append(options, QueryValue(key, value))
+			options = append(options, Query(key, value))
 		}
 	}
 
@@ -166,13 +210,13 @@ func BodyString(body string) Option {
 }
 
 // BodyForm URL-encodes multiple key/value pairs and applies the result to the *http.Request body.
-type BodyForm url.Values
+type BodyForm neturl.Values
 
 // Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
 	return Apply(request,
 		Header("Content-Type", "application/x-www-form-urlencoded"),
-		BodyString(url.Values(f).Encode()),
+		BodyString(neturl.Values(f).Encode()),
 	)
 }
 

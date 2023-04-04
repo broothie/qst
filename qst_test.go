@@ -12,7 +12,7 @@ import (
 
 func TestNew(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
-		_, err := New("lol what", "")
+		_, err := New("lol what")
 		assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 	})
 }
@@ -20,13 +20,16 @@ func TestNew(t *testing.T) {
 func ExampleNew() {
 	// Output:
 	// POST
-	// http://httpbin.org/post?limit=10
+	// https://httpbin.org/post?limit=10
 	// Bearer some-token
 	// {"key":"value"}
 
-	req, _ := New(http.MethodPost, "http://httpbin.org/post",
+	req, _ := New(http.MethodPost,
+		Scheme("https"),
+		Host("httpbin.org"),
+		Path("/post"),
 		BearerAuth("some-token"),
-		QueryValue("limit", "10"),
+		Query("limit", "10"),
 		BodyJSON(map[string]string{"key": "value"}),
 	)
 
@@ -55,9 +58,10 @@ func ExampleDo() {
 	}))
 	defer server.Close()
 
-	Do(http.MethodPost, server.URL,
+	Do(http.MethodPost,
+		URL(server.URL),
 		BearerAuth("some-token"),
-		QueryValue("limit", "10"),
+		Query("limit", "10"),
 		BodyJSON(map[string]string{"key": "value"}),
 	)
 }

@@ -11,9 +11,9 @@ import (
 
 func TestMethods(t *testing.T) {
 	type testCase struct {
-		new      func(url string, options ...Option) (*http.Request, error)
-		do       func(url string, options ...Option) (*http.Response, error)
-		clientDo func(url string, options ...Option) (*http.Response, error)
+		new      func(options ...Option) (*http.Request, error)
+		do       func(options ...Option) (*http.Response, error)
+		clientDo func(options ...Option) (*http.Response, error)
 	}
 
 	client := http.DefaultClient
@@ -69,10 +69,9 @@ func TestMethods(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, method, r.Method)
 		}))
-		defer server.Close()
 
 		t.Run("new", func(t *testing.T) {
-			req, err := tc.new(server.URL)
+			req, err := tc.new(URL(server.URL))
 			assert.NoError(t, err)
 
 			_, err = http.DefaultClient.Do(req)
@@ -80,13 +79,15 @@ func TestMethods(t *testing.T) {
 		})
 
 		t.Run("do", func(t *testing.T) {
-			_, err := tc.do(server.URL)
+			_, err := tc.do(URL(server.URL))
 			require.NoError(t, err)
 		})
 
 		t.Run("do", func(t *testing.T) {
-			_, err := tc.clientDo(server.URL)
+			_, err := tc.clientDo(URL(server.URL))
 			require.NoError(t, err)
 		})
+
+		server.Close()
 	}
 }
