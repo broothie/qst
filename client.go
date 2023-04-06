@@ -23,7 +23,7 @@ type Client struct {
 
 // Do makes an *http.Request and returns the *http.Response using the Doer assigned to c.
 func (c *Client) Do(method string, options ...Option) (*http.Response, error) {
-	request, err := New(method, append(c.Pipeline, options...)...)
+	request, err := New(method, "", append(c.Pipeline, options...)...)
 	if err != nil {
 		return nil, err
 	}

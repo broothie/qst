@@ -19,6 +19,7 @@ func ExampleNewClient() {
 		fmt.Println(r.Header.Get("Authorization"))
 		fmt.Println(r.URL.RawQuery)
 	}))
+	defer server.Close()
 
 	client := NewClient(http.DefaultClient, URL(server.URL), BearerAuth("asdf"))
 	client.Get(Query("page", "10"))

@@ -12,7 +12,7 @@ import (
 
 func TestNew(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
-		_, err := New("lol what")
+		_, err := New("lol what", "https://example.com")
 		assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 	})
 }
@@ -24,7 +24,7 @@ func ExampleNew() {
 	// Bearer some-token
 	// {"key":"value"}
 
-	req, _ := New(http.MethodPost,
+	req, _ := New(http.MethodPost, "https://example.com",
 		Scheme("https"),
 		Host("httpbin.org"),
 		Path("/post"),
@@ -58,7 +58,7 @@ func ExampleDo() {
 	}))
 	defer server.Close()
 
-	Do(http.MethodPost,
+	Do(http.MethodPost, "https://example.com",
 		URL(server.URL),
 		BearerAuth("some-token"),
 		Query("limit", "10"),

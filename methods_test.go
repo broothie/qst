@@ -11,8 +11,8 @@ import (
 
 func TestMethods(t *testing.T) {
 	type testCase struct {
-		new      func(options ...Option) (*http.Request, error)
-		do       func(options ...Option) (*http.Response, error)
+		new      func(url string, options ...Option) (*http.Request, error)
+		do       func(url string, options ...Option) (*http.Response, error)
 		clientDo func(options ...Option) (*http.Response, error)
 	}
 
@@ -71,7 +71,7 @@ func TestMethods(t *testing.T) {
 		}))
 
 		t.Run("new", func(t *testing.T) {
-			req, err := tc.new(URL(server.URL))
+			req, err := tc.new(server.URL)
 			assert.NoError(t, err)
 
 			_, err = http.DefaultClient.Do(req)
@@ -79,11 +79,11 @@ func TestMethods(t *testing.T) {
 		})
 
 		t.Run("do", func(t *testing.T) {
-			_, err := tc.do(URL(server.URL))
+			_, err := tc.do(server.URL)
 			require.NoError(t, err)
 		})
 
-		t.Run("do", func(t *testing.T) {
+		t.Run("clientDo", func(t *testing.T) {
 			_, err := tc.clientDo(URL(server.URL))
 			require.NoError(t, err)
 		})

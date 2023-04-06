@@ -7,12 +7,13 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	neturl "net/url"
 	"path"
 )
 
-// Option is an option for building *http.Requests.
+// Option is an option for building an *http.Request.
 type Option interface {
 	Apply(request *http.Request) (*http.Request, error)
 }
@@ -39,11 +40,12 @@ type OptionFunc func(request *http.Request) (*http.Request, error)
 // Apply applies the OptionFunc to the *http.Request.
 func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return f(request) }
 
-// Apply applies the Options to the *http.Request
+// Apply applies the Options to the *http.Request.
 func Apply(request *http.Request, options ...Option) (*http.Request, error) {
 	return Pipeline(options).Apply(request)
 }
 
+// RawURL applies the URL to the *http.Request.
 func RawURL(url *neturl.URL) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.URL = url
@@ -51,6 +53,7 @@ func RawURL(url *neturl.URL) Option {
 	})
 }
 
+// URL applies a url string to the *http.Request.
 func URL(url string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		u, err := neturl.Parse(url)
@@ -62,6 +65,7 @@ func URL(url string) Option {
 	})
 }
 
+// Scheme applies the scheme to the *http.Request URL.
 func Scheme(scheme string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.URL.Scheme = scheme
@@ -69,6 +73,7 @@ func Scheme(scheme string) Option {
 	})
 }
 
+// User applies the Userinfo to the *http.Request URL User.
 func User(user *neturl.Userinfo) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.URL.User = user
@@ -76,10 +81,17 @@ func User(user *neturl.Userinfo) Option {
 	})
 }
 
+// Username applies the username to *http.Request URL User.
+func Username(username string) Option {
+	return User(neturl.User(username))
+}
+
+// UserPassword applies the username and password to *http.Request URL User.
 func UserPassword(username, password string) Option {
 	return User(neturl.UserPassword(username, password))
 }
 
+// Host applies the host to the *http.Request and *http.Request URL.
 func Host(host string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Host = host
@@ -88,6 +100,7 @@ func Host(host string) Option {
 	})
 }
 
+// Path joins the segments with path.Join, and appends the result to the *http.Request URL.
 func Path(segments ...string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		elem := []string{request.URL.Path}
@@ -124,10 +137,18 @@ func (q Queries) Apply(request *http.Request) (*http.Request, error) {
 	return options.Apply(request)
 }
 
-// Header applies a key/value pair to the headers of the *http.Request.
+// Header applies a key/value pair to the headers of the *http.Request, retaining the existing headers for the key.
 func Header(key, value string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Header.Add(key, value)
+		return request, nil
+	})
+}
+
+// SetHeader overwrites the header values at a key on a *http.Request.
+func SetHeader(key string, values ...string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.Header[key] = values
 		return request, nil
 	})
 }
@@ -147,7 +168,7 @@ func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 	return options.Apply(request)
 }
 
-// Cookie applies a cookie to the *http.Request
+// Cookie applies a cookie to the *http.Request.
 func Cookie(cookie *http.Cookie) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.AddCookie(cookie)
@@ -187,7 +208,7 @@ func ContextValue(key, value interface{}) Option {
 	})
 }
 
-// Body applies a io.ReadCloser to the *http.Request body.
+// Body applies an io.ReadCloser to the *http.Request body.
 func Body(body io.ReadCloser) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Body = body
@@ -195,8 +216,9 @@ func Body(body io.ReadCloser) Option {
 	})
 }
 
+// BodyReader applies an io.Reader to the *http.Request body.
 func BodyReader(body io.Reader) Option {
-	return Body(io.NopCloser(body))
+	return Body(ioutil.NopCloser(body))
 }
 
 // BodyBytes applies a slice of bytes to the *http.Request body.

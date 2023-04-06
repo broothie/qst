@@ -9,20 +9,22 @@
 ## Installation
 
 ```shell script
-$ go get github.com/broothie/qst
+go get github.com/broothie/qst
 ```
 
 ## Documentation
 
 Detailed documentation can be found at [pkg.go.dev](https://pkg.go.dev/github.com/broothie/qst).
 
+A list of all available options can be found [here](https://pkg.go.dev/github.com/broothie/qst#Option).
+
 ## Usage
 
 `qst` uses an options pattern to build `*http.Request` objects:
 ```go
-request, err := qst.NewPatch("http://example.com",   // New PATCH request
-    qst.Bearer("some-token-here"),                   // Authorization header
-    qst.QueryValue("key", "value"),                  // Query param
+request, err := qst.NewPatch("https://example.com",  // New PATCH request
+    qst.BearerAuth("some-token-here"),               // Authorization header
+    qst.Query("key", "value"),                       // Query param
     qst.BodyJSON(map[string]string{"key": "value"}), // JSON body
 )
 ```
@@ -31,9 +33,9 @@ Documentation for all available options can be found [here](https://pkg.go.dev/g
 
 It can also be used to fire requests:
 ```go
-response, err := qst.Patch("http://example.com",     // Send PATCH request
-    qst.Bearer("some-token-here"),                   // Authorization header
-    qst.QueryValue("key", "value"),                  // Query param
+response, err := qst.Patch("https://example.com",    // Send PATCH request
+    qst.BearerAuth("some-token-here"),               // Authorization header
+    qst.Query("key", "value"),                       // Query param
     qst.BodyJSON(map[string]string{"key": "value"}), // JSON body
 )
 ```
@@ -45,7 +47,7 @@ func createdAfter(after time.Time) qst.Option {
 }
 
 func main() {
-    response, err := qst.Get("http://example.com", createdAfter(time.Now().Add(-24 * time.Hour)))
+    response, err := qst.Get("https://example.com", createdAfter(time.Now().Add(-24 * time.Hour)))
 }
 ```
 
@@ -53,6 +55,6 @@ If you wish to use an existing `*http.Client`:
 ```go
 func makeCall(token string, payload map[string]interface{}) {
     client := &http.Client{Timeout: 3 * time.Second}
-    response, err := qst.WithClient(client).Post("http://example.com", qst.Bearer(token), qst.BodyJSON(payload))
+    response, err := qst.WithClient(client).Post("https://example.com", qst.Bearer(token), qst.BodyJSON(payload))
 }
 ```
