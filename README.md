@@ -22,6 +22,7 @@ A list of all available options can be found [here](https://pkg.go.dev/github.co
 ## Usage
 
 `qst` uses an options pattern to build `*http.Request` objects:
+
 ```go
 request, err := qst.NewPatch("https://breakfast.com/api", // New PATCH request
     qst.BearerAuth("c0rNfl@k3s"),                         // Authorization header
@@ -30,9 +31,8 @@ request, err := qst.NewPatch("https://breakfast.com/api", // New PATCH request
 )
 ```
 
-Documentation for all available options can be found [here](https://pkg.go.dev/github.com/broothie/qst#Option).
-
 It can also be used to fire requests:
+
 ```go
 request, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
     qst.BearerAuth("c0rNfl@k3s"),                      // Authorization header
@@ -42,6 +42,7 @@ request, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
 ```
 
 The options pattern makes it easy to define custom options:
+
 ```go
 func createdSinceYesterday() qst.Option {
     return qst.QueryValue("created_at", fmt.Sprintf(">=%s", time.Now().Add(-24 * time.Hour).Format(time.RFC3339)))
@@ -79,6 +80,7 @@ response, err := client.Patch(
 ### qst.OptionFunc
 
 `OptionFunc` can be used to add a custom function which is run during request creation:
+
 ```go
 client := qst.NewClient(http.DefaultClient,
     qst.OptionFunc(func(request *http.Request) (*http.Request, error) {
