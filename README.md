@@ -45,13 +45,13 @@ The options pattern makes it easy to define custom options:
 
 ```go
 func createdSinceYesterday() qst.Option {
-    return qst.QueryValue("created_at", fmt.Sprintf(">=%s", time.Now().Add(-24 * time.Hour).Format(time.RFC3339)))
+    return qst.Query("created_at", fmt.Sprintf(">=%s", time.Now().Add(-24 * time.Hour).Format(time.RFC3339)))
 }
 
 func main() {
     response, err := qst.Get("https://breakfast.com/api",
         qst.BearerAuth("c0rNfl@k3s"),
-        qst.Path("/cereals")
+        qst.Path("/cereals"),
         createdSinceYesterday(),
     )
 }
