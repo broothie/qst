@@ -2,10 +2,11 @@ package qst_test
 
 import (
 	"bytes"
-	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -13,38 +14,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOptions(t *testing.T) {
+func TestOptions_errors(t *testing.T) {
+	t.Run("URL error", func(t *testing.T) {
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.URL("%"))
+		assert.EqualError(t, err, `parse %: invalid URL escape "%"`)
+	})
+
 	t.Run("BodyJSON error", func(t *testing.T) {
-		_, err := qst.NewPost("https://breakfast.com/api", qst.BodyJSON(make(chan struct{})))
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyJSON(make(chan struct{})))
 		assert.EqualError(t, err, "json: unsupported type: chan struct {}")
 	})
 
 	t.Run("BodyXML error", func(t *testing.T) {
-		_, err := qst.NewPost("https://breakfast.com/api", qst.BodyXML(make(chan struct{})))
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyXML(make(chan struct{})))
 		assert.EqualError(t, err, "xml: unsupported type: chan struct {}")
 	})
 
-	t.Run("Context", func(t *testing.T) {
-		type keyType struct{}
-		var key keyType
-
-		request, err := qst.NewPost("https://breakfast.com/api",
-			qst.Context(context.WithValue(context.TODO(), key, "milk")),
+	t.Run("Dump read error", func(t *testing.T) {
+		_, err := qst.NewGet("https://breakfast.com/api/cereals",
+			qst.BodyReader(broken{}),
+			qst.Dump(os.Stdout),
 		)
 
-		assert.NoError(t, err)
-		assert.Equal(t, "milk", request.Context().Value(key))
+		assert.EqualError(t, err, "broken")
 	})
 
-	t.Run("ContextValue", func(t *testing.T) {
-		type keyType struct{}
-		var key keyType
+	t.Run("Dump write error", func(t *testing.T) {
+		_, err := qst.NewGet("https://breakfast.com/api/cereals",
+			qst.Dump(broken{}),
+		)
 
-		request, err := qst.NewPost("https://breakfast.com/api", qst.ContextValue(key, "milk"))
-
-		assert.NoError(t, err)
-
-		assert.Equal(t, "milk", request.Context().Value(key))
+		assert.EqualError(t, err, "broken")
 	})
 }
 
@@ -208,7 +208,7 @@ func ExampleBodyForm() {
 }
 
 func ExampleBodyJSON() {
-	request, _ := qst.NewPost("https://breakfast.com/api",
+	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
 		qst.BodyJSON(map[string]string{"name": "Rice Krispies"}),
 	)
 
@@ -218,10 +218,36 @@ func ExampleBodyJSON() {
 }
 
 func ExampleBodyXML() {
-	request, _ := qst.NewPost("https://breakfast.com/api",
+	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
 		qst.BodyXML("Part of a complete breakfast."),
 	)
 	body, _ := ioutil.ReadAll(request.Body)
 	fmt.Println(string(body))
 	// Output: <string>Part of a complete breakfast.</string>
+}
+
+func TestDump(t *testing.T) {
+	var buffer bytes.Buffer
+	qst.NewGet("https://breakfast.com/api/cereals",
+		qst.BodyString("Part of a complete breakfast."),
+		qst.Dump(&buffer),
+	)
+
+	expected := "" +
+		"GET /api/cereals HTTP/1.1\r\n" +
+		"Host: breakfast.com\r\n" +
+		"\r\n" +
+		"Part of a complete breakfast."
+
+	assert.Equal(t, expected, buffer.String())
+}
+
+type broken struct{}
+
+func (broken) Write([]byte) (int, error) {
+	return 0, errors.New("broken")
+}
+
+func (broken) Read([]byte) (int, error) {
+	return 0, errors.New("broken")
 }

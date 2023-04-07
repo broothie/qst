@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	pkgurl "net/url"
 	pkgpath "path"
 )
@@ -168,7 +169,7 @@ func Context(ctx context.Context) Option {
 // ContextValue applies a context key/value pair to the *http.Request.
 func ContextValue(key, value interface{}) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
-		return request.WithContext(context.WithValue(request.Context(), key, value)), nil
+		return Context(context.WithValue(request.Context(), key, value)).Apply(request)
 	})
 }
 
@@ -233,5 +234,21 @@ func BodyXML(v interface{}) Option {
 			Header("Content-Type", "application/xml"),
 			BodyReader(body),
 		)
+	})
+}
+
+// Dump writes the request to `w`.
+func Dump(w io.Writer) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		dump, err := httputil.DumpRequest(request, true)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := w.Write(dump); err != nil {
+			return nil, err
+		}
+
+		return request, nil
 	})
 }

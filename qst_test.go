@@ -13,7 +13,7 @@ import (
 
 func TestNew(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
-		_, err := qst.New("lol what", "https://breakfast.com/api")
+		_, err := qst.New("lol what", "https://breakfast.com/api/cereals")
 		assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 	})
 }

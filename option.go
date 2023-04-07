@@ -1,9 +1,7 @@
 package qst
 
 import (
-	"io"
 	"net/http"
-	"net/http/httputil"
 )
 
 // Option is an option for building an *http.Request.
@@ -40,20 +38,4 @@ func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return
 // Apply applies the Options to the *http.Request.
 func Apply(request *http.Request, options ...Option) (*http.Request, error) {
 	return Pipeline(options).Apply(request)
-}
-
-// Dump prints the request.
-func Dump(w io.Writer) Option {
-	return OptionFunc(func(request *http.Request) (*http.Request, error) {
-		dump, err := httputil.DumpRequest(request, true)
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := w.Write(dump); err != nil {
-			return nil, err
-		}
-
-		return request, nil
-	})
 }
