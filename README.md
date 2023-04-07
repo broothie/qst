@@ -45,7 +45,8 @@ The options pattern makes it easy to define custom options:
 
 ```go
 func createdSinceYesterday() qst.Option {
-    return qst.Query("created_at", fmt.Sprintf(">=%s", time.Now().Add(-24 * time.Hour).Format(time.RFC3339)))
+    yesterday := time.Now().Add(-24 * time.Hour)
+    return qst.Query("created_at", fmt.Sprintf(">%s", yesterday.Format(time.RFC3339)))
 }
 
 func main() {
