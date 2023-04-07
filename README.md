@@ -72,7 +72,7 @@ response, err := client.Patch(
     // qst.BearerAuth("c0rNfl@k3s"),         // Not necessary, included via client
     qst.Path("/cereals", cerealID),
     qst.BodyJSON(map[string]interface{}{
-        "username": "hunter13",
+        "name": "Golden Grahams",
     }),
 )
 ```
