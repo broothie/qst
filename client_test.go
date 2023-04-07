@@ -24,10 +24,10 @@ func ExampleNewClient() {
 
 	client := qst.NewClient(http.DefaultClient,
 		qst.URL(server.URL),
-		qst.BearerAuth("asdf"),
+		qst.BearerAuth("c0rnfl@k3s"),
 	)
 
 	client.Get(qst.Query("page", "10"))
-	// Output: Bearer asdf
+	// Output: Bearer c0rnfl@k3s
 	// page=10
 }
