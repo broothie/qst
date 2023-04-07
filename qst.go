@@ -14,5 +14,5 @@ func New(method, url string, options ...Option) (*http.Request, error) {
 
 // Do makes an *http.Request using the current DefaultClient and returns the *http.Response.
 func Do(method, url string, options ...Option) (*http.Response, error) {
-	return DefaultClient.Do(method, append([]Option{URL(url)}, options...)...)
+	return DefaultClient.Do(method, Pipeline{URL(url)}.With(options...)...)
 }

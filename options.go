@@ -9,44 +9,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	neturl "net/url"
-	"path"
+	pkgurl "net/url"
+	pkgpath "path"
 )
 
-// Option is an option for building an *http.Request.
-type Option interface {
-	Apply(request *http.Request) (*http.Request, error)
-}
-
-// Pipeline is a collection of options, which can be applied as a whole.
-type Pipeline []Option
-
-// Apply applies the Pipeline to the *http.Request.
-func (p Pipeline) Apply(request *http.Request) (*http.Request, error) {
-	for _, option := range p {
-		var err error
-		request, err = option.Apply(request.Clone(request.Context()))
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return request, nil
-}
-
-// OptionFunc is a function form of Option.
-type OptionFunc func(request *http.Request) (*http.Request, error)
-
-// Apply applies the OptionFunc to the *http.Request.
-func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return f(request) }
-
-// Apply applies the Options to the *http.Request.
-func Apply(request *http.Request, options ...Option) (*http.Request, error) {
-	return Pipeline(options).Apply(request)
-}
-
 // RawURL applies the URL to the *http.Request.
-func RawURL(url *neturl.URL) Option {
+func RawURL(url *pkgurl.URL) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.URL = url
 		return request, nil
@@ -56,7 +24,7 @@ func RawURL(url *neturl.URL) Option {
 // URL applies a url string to the *http.Request.
 func URL(url string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
-		u, err := neturl.Parse(url)
+		u, err := pkgurl.Parse(url)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +42,7 @@ func Scheme(scheme string) Option {
 }
 
 // User applies the Userinfo to the *http.Request URL User.
-func User(user *neturl.Userinfo) Option {
+func User(user *pkgurl.Userinfo) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.URL.User = user
 		return request, nil
@@ -83,12 +51,12 @@ func User(user *neturl.Userinfo) Option {
 
 // Username applies the username to *http.Request URL User.
 func Username(username string) Option {
-	return User(neturl.User(username))
+	return User(pkgurl.User(username))
 }
 
 // UserPassword applies the username and password to *http.Request URL User.
 func UserPassword(username, password string) Option {
-	return User(neturl.UserPassword(username, password))
+	return User(pkgurl.UserPassword(username, password))
 }
 
 // Host applies the host to the *http.Request and *http.Request URL.
@@ -105,8 +73,12 @@ func Path(segments ...string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		elem := []string{request.URL.Path}
 		elem = append(elem, segments...)
-		request.URL.Path = path.Join(elem...)
+		path := pkgpath.Join(elem...)
+		if !pkgpath.IsAbs(path) {
+			path = fmt.Sprintf("/%s", path)
+		}
 
+		request.URL.Path = path
 		return request, nil
 	})
 }
@@ -123,7 +95,7 @@ func Query(key, value string) Option {
 }
 
 // Queries applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
-type Queries neturl.Values
+type Queries pkgurl.Values
 
 // Apply applies the Queries to the *http.Request.
 func (q Queries) Apply(request *http.Request) (*http.Request, error) {
@@ -141,14 +113,6 @@ func (q Queries) Apply(request *http.Request) (*http.Request, error) {
 func Header(key, value string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Header.Add(key, value)
-		return request, nil
-	})
-}
-
-// SetHeader overwrites the header values at a key on a *http.Request.
-func SetHeader(key string, values ...string) Option {
-	return OptionFunc(func(request *http.Request) (*http.Request, error) {
-		request.Header[key] = values
 		return request, nil
 	})
 }
@@ -232,13 +196,13 @@ func BodyString(body string) Option {
 }
 
 // BodyForm URL-encodes multiple key/value pairs and applies the result to the *http.Request body.
-type BodyForm neturl.Values
+type BodyForm pkgurl.Values
 
 // Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
 	return Apply(request,
 		Header("Content-Type", "application/x-www-form-urlencoded"),
-		BodyString(neturl.Values(f).Encode()),
+		BodyString(pkgurl.Values(f).Encode()),
 	)
 }
 

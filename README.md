@@ -22,10 +22,10 @@ A list of all available options can be found [here](https://pkg.go.dev/github.co
 
 `qst` uses an options pattern to build `*http.Request` objects:
 ```go
-request, err := qst.NewPatch("https://example.com",  // New PATCH request
-    qst.BearerAuth("some-token-here"),               // Authorization header
-    qst.Query("key", "value"),                       // Query param
-    qst.BodyJSON(map[string]string{"key": "value"}), // JSON body
+request, err := qst.NewPatch("https://breakfast.com/api", // New PATCH request
+    qst.BearerAuth("c0rNfl@k3s"),                         // Authorization header
+    qst.Path("/cereals", cerealID),                       // Query param
+    qst.BodyJSON(map[string]string{"name": "Life"}),      // JSON body
 )
 ```
 
@@ -33,28 +33,56 @@ Documentation for all available options can be found [here](https://pkg.go.dev/g
 
 It can also be used to fire requests:
 ```go
-response, err := qst.Patch("https://example.com",    // Send PATCH request
-    qst.BearerAuth("some-token-here"),               // Authorization header
-    qst.Query("key", "value"),                       // Query param
-    qst.BodyJSON(map[string]string{"key": "value"}), // JSON body
+request, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
+    qst.BearerAuth("c0rNfl@k3s"),                      // Authorization header
+    qst.Path("/cereals", cerealID),                    // Query param
+    qst.BodyJSON(map[string]string{"name": "Life"}),   // JSON body
 )
 ```
 
-The options pattern allows for easily defining commonly used options:
+The options pattern makes it easy to define custom options:
 ```go
-func createdAfter(after time.Time) qst.Option {
-    return qst.QueryValue("created_at", fmt.Sprintf(">=%s", after.Format(time.RFC3339)))
+func createdSinceYesterday() qst.Option {
+    return qst.QueryValue("created_at", fmt.Sprintf(">=%s", time.Now().Add(-24 * time.Hour).Format(time.RFC3339)))
 }
 
 func main() {
-    response, err := qst.Get("https://example.com", createdAfter(time.Now().Add(-24 * time.Hour)))
+    response, err := qst.Get("https://breakfast.com/api",
+        qst.BearerAuth("c0rNfl@k3s"),
+        qst.Path("/cereals")
+        createdSinceYesterday(),
+    )
 }
 ```
 
-If you wish to use an existing `*http.Client`:
+### qst.Client
+
+This package also includes a `Client`, which can be outfitted with a set of default options:
+
 ```go
-func makeCall(token string, payload map[string]interface{}) {
-    client := &http.Client{Timeout: 3 * time.Second}
-    response, err := qst.WithClient(client).Post("https://example.com", qst.Bearer(token), qst.BodyJSON(payload))
-}
+client := qst.NewClient(http.DefaultClient,
+    qst.URL("https://breakfast.com/api"),
+    qst.BearerAuth("c0rNfl@k3s"), 
+)
+
+response, err := client.Patch(
+    // qst.URL("https://breakfast.com/api"), // Not necessary, included via client
+    // qst.BearerAuth("c0rNfl@k3s"),         // Not necessary, included via client
+    qst.Path("/cereals", cerealID),
+    qst.BodyJSON(map[string]interface{}{
+        "username": "hunter13",
+    }),
+)
+```
+
+### qst.OptionFunc
+
+`OptionFunc` can be used to add a custom function which is run during request creation:
+```go
+client := qst.NewClient(http.DefaultClient,
+    qst.OptionFunc(func(request *http.Request) (*http.Request, error) {
+      token := dynamicallyGetBearerTokenSomehow()
+      return qst.BearerAuth(token).Apply(request)
+    }),
+)
 ```

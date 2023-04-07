@@ -1,4 +1,4 @@
-package qst
+package qst_test
 
 import (
 	"fmt"
@@ -6,11 +6,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/broothie/qst"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestClient_Do(t *testing.T) {
-	_, err := NewClient(http.DefaultClient).Do("lol what")
+	_, err := qst.NewClient(http.DefaultClient).Do("lol what")
 	assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 }
 
@@ -21,8 +22,12 @@ func ExampleNewClient() {
 	}))
 	defer server.Close()
 
-	client := NewClient(http.DefaultClient, URL(server.URL), BearerAuth("asdf"))
-	client.Get(Query("page", "10"))
+	client := qst.NewClient(http.DefaultClient,
+		qst.URL(server.URL),
+		qst.BearerAuth("asdf"),
+	)
+
+	client.Get(qst.Query("page", "10"))
 	// Output: Bearer asdf
 	// page=10
 }

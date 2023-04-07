@@ -17,15 +17,15 @@ func TestSmoke(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 			// Verify
 			assert.Equal(t, http.MethodPost, r.Method)
-			assert.Equal(t, "Bearer asdf", r.Header.Get("Authorization"))
-			assert.Equal(t, "here", r.Header.Get("something"))
+			assert.Equal(t, "Bearer c0rnfl@k3s", r.Header.Get("Authorization"))
+			assert.Equal(t, "oats", r.Header.Get("grain"))
 		}))
 		defer server.Close()
 
 		// Exercise
-		_, err := qst.Post("https://example.com",
-			qst.BearerAuth("asdf"),
-			qst.Header("something", "here"),
+		_, err := qst.Post(server.URL,
+			qst.BearerAuth("c0rnfl@k3s"),
+			qst.Header("grain", "oats"),
 		)
 
 		require.NoError(t, err)
@@ -36,20 +36,20 @@ func TestSmoke(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 			// Verify
 			assert.Equal(t, http.MethodPost, r.Method)
-			assert.Equal(t, "Bearer asdf", r.Header.Get("Authorization"))
+			assert.Equal(t, "Bearer c0rnfl@k3s", r.Header.Get("Authorization"))
 
 			var body map[string]interface{}
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&body))
 
-			assert.Equal(t, "here", body["something"])
-			assert.EqualValues(t, 1, body["a"])
+			assert.Equal(t, "Raisin Bran Crunch", body["name"])
+			assert.True(t, body["raisins"].(bool))
 		}))
 		defer server.Close()
 
 		// Exercise
-		_, err := qst.Post("https://example.com",
-			qst.BearerAuth("asdf"),
-			qst.BodyJSON(map[string]interface{}{"something": "here", "a": 1}),
+		_, err := qst.Post(server.URL,
+			qst.BearerAuth("c0rnfl@k3s"),
+			qst.BodyJSON(map[string]interface{}{"name": "Raisin Bran Crunch", "raisins": true}),
 		)
 		require.NoError(t, err)
 	})
