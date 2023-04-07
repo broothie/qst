@@ -3,26 +3,27 @@ package qst
 import "net/http"
 
 // DefaultClient captures the current Doer.
-var DefaultClient = Client{doer: http.DefaultClient}
+var DefaultClient = NewClient(http.DefaultClient)
 
-// WithClient captures a *http.Client (or anything that implements Do(*http.Request) (*http.Response, error)).
-func WithClient(doer Doer) *Client {
-	return &Client{doer: doer}
-}
-
-// Doer is typically a *http.Client.
+// Doer is typically an *http.Client.
 type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// Client captures a Doer.
+// NewClient creates a new Client.
+func NewClient(doer Doer, options ...Option) *Client {
+	return &Client{doer: doer, Pipeline: options}
+}
+
+// Client captures a Doer and Options to apply to every request.
 type Client struct {
+	Pipeline
 	doer Doer
 }
 
-// Do makes a *http.Request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Do(method, url string, options ...Option) (*http.Response, error) {
-	request, err := New(method, url, options...)
+// Do makes an *http.Request and returns the *http.Response using the Doer assigned to c.
+func (c *Client) Do(method string, options ...Option) (*http.Response, error) {
+	request, err := New(method, "", append(c.Pipeline, options...)...)
 	if err != nil {
 		return nil, err
 	}

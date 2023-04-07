@@ -7,39 +7,85 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"net/url"
+	"net/http/httputil"
+	pkgurl "net/url"
+	pkgpath "path"
 )
 
-// Option is an option for building *http.Requests.
-type Option interface {
-	Apply(request *http.Request) (*http.Request, error)
+// RawURL applies the URL to the *http.Request.
+func RawURL(url *pkgurl.URL) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL = url
+		return request, nil
+	})
 }
 
-// Pipeline is a collection of options, which can be applied as a whole.
-type Pipeline []Option
-
-// Apply applies the Pipeline to the *http.Request.
-func (p Pipeline) Apply(request *http.Request) (*http.Request, error) {
-	for _, option := range p {
-		var err error
-		request, err = option.Apply(request.Clone(request.Context()))
+// URL applies a url string to the *http.Request.
+func URL(url string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		u, err := pkgurl.Parse(url)
 		if err != nil {
 			return nil, err
 		}
-	}
 
-	return request, nil
+		return RawURL(u).Apply(request)
+	})
 }
 
-// OptionFunc is a function form of Option.
-type OptionFunc func(request *http.Request) (*http.Request, error)
+// Scheme applies the scheme to the *http.Request URL.
+func Scheme(scheme string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL.Scheme = scheme
+		return request, nil
+	})
+}
 
-// Apply applies the OptionFunc to the *http.Request.
-func (f OptionFunc) Apply(request *http.Request) (*http.Request, error) { return f(request) }
+// User applies the Userinfo to the *http.Request URL User.
+func User(user *pkgurl.Userinfo) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.URL.User = user
+		return request, nil
+	})
+}
 
-// QueryValue applies a key/value pair to the query parameters of the *http.Request.
-func QueryValue(key, value string) Option {
+// Username applies the username to *http.Request URL User.
+func Username(username string) Option {
+	return User(pkgurl.User(username))
+}
+
+// UserPassword applies the username and password to *http.Request URL User.
+func UserPassword(username, password string) Option {
+	return User(pkgurl.UserPassword(username, password))
+}
+
+// Host applies the host to the *http.Request and *http.Request URL.
+func Host(host string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		request.Host = host
+		request.URL.Host = host
+		return request, nil
+	})
+}
+
+// Path joins the segments with path.Join, and appends the result to the *http.Request URL.
+func Path(segments ...string) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		elem := []string{request.URL.Path}
+		elem = append(elem, segments...)
+		path := pkgpath.Join(elem...)
+		if !pkgpath.IsAbs(path) {
+			path = fmt.Sprintf("/%s", path)
+		}
+
+		request.URL.Path = path
+		return request, nil
+	})
+}
+
+// Query applies a key/value pair to the query parameters of the *http.Request.
+func Query(key, value string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		query := request.URL.Query()
 		query.Add(key, value)
@@ -49,22 +95,22 @@ func QueryValue(key, value string) Option {
 	})
 }
 
-// Query applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
-type Query url.Values
+// Queries applies multiple key/value pairs to the query parameters of the *http.Request. It wraps url.Values.
+type Queries pkgurl.Values
 
-// Apply applies the Query to the *http.Request.
-func (q Query) Apply(request *http.Request) (*http.Request, error) {
+// Apply applies the Queries to the *http.Request.
+func (q Queries) Apply(request *http.Request) (*http.Request, error) {
 	options := make(Pipeline, 0, len(q))
 	for key, values := range q {
 		for _, value := range values {
-			options = append(options, QueryValue(key, value))
+			options = append(options, Query(key, value))
 		}
 	}
 
 	return options.Apply(request)
 }
 
-// Header applies a key/value pair to the headers of the *http.Request.
+// Header applies a key/value pair to the headers of the *http.Request, retaining the existing headers for the key.
 func Header(key, value string) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Header.Add(key, value)
@@ -87,7 +133,7 @@ func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 	return options.Apply(request)
 }
 
-// Cookie applies a cookie to the *http.Request
+// Cookie applies a cookie to the *http.Request.
 func Cookie(cookie *http.Cookie) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.AddCookie(cookie)
@@ -123,11 +169,11 @@ func Context(ctx context.Context) Option {
 // ContextValue applies a context key/value pair to the *http.Request.
 func ContextValue(key, value interface{}) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
-		return request.WithContext(context.WithValue(request.Context(), key, value)), nil
+		return Context(context.WithValue(request.Context(), key, value)).Apply(request)
 	})
 }
 
-// Body applies a io.ReadCloser to the *http.Request body.
+// Body applies an io.ReadCloser to the *http.Request body.
 func Body(body io.ReadCloser) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		request.Body = body
@@ -135,8 +181,9 @@ func Body(body io.ReadCloser) Option {
 	})
 }
 
+// BodyReader applies an io.Reader to the *http.Request body.
 func BodyReader(body io.Reader) Option {
-	return Body(io.NopCloser(body))
+	return Body(ioutil.NopCloser(body))
 }
 
 // BodyBytes applies a slice of bytes to the *http.Request body.
@@ -150,14 +197,14 @@ func BodyString(body string) Option {
 }
 
 // BodyForm URL-encodes multiple key/value pairs and applies the result to the *http.Request body.
-type BodyForm url.Values
+type BodyForm pkgurl.Values
 
 // Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
-	return Pipeline{
+	return Apply(request,
 		Header("Content-Type", "application/x-www-form-urlencoded"),
-		BodyString(url.Values(f).Encode()),
-	}.Apply(request)
+		BodyString(pkgurl.Values(f).Encode()),
+	)
 }
 
 // BodyJSON encodes an object as JSON and applies it to the *http.Request body.
@@ -168,10 +215,10 @@ func BodyJSON(v interface{}) Option {
 			return nil, err
 		}
 
-		return Pipeline{
+		return Apply(request,
 			Header("Content-Type", "application/json"),
 			BodyReader(body),
-		}.Apply(request)
+		)
 	})
 }
 
@@ -183,9 +230,25 @@ func BodyXML(v interface{}) Option {
 			return nil, err
 		}
 
-		return Pipeline{
+		return Apply(request,
 			Header("Content-Type", "application/xml"),
 			BodyReader(body),
-		}.Apply(request)
+		)
+	})
+}
+
+// Dump writes the request to w.
+func Dump(w io.Writer) Option {
+	return OptionFunc(func(request *http.Request) (*http.Request, error) {
+		dump, err := httputil.DumpRequest(request, true)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := w.Write(dump); err != nil {
+			return nil, err
+		}
+
+		return request, nil
 	})
 }

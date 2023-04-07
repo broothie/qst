@@ -1,4 +1,4 @@
-package qst
+package qst_test
 
 import (
 	"fmt"
@@ -7,57 +7,58 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/broothie/qst"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
 	t.Run("error", func(t *testing.T) {
-		_, err := New("lol what", "")
+		_, err := qst.New("lol what", "https://breakfast.com/api/cereals")
 		assert.EqualError(t, err, `net/http: invalid method "lol what"`)
 	})
 }
 
 func ExampleNew() {
-	// Output:
-	// POST
-	// http://httpbin.org/post?limit=10
-	// Bearer some-token
-	// {"key":"value"}
-
-	req, _ := New(http.MethodPost, "http://httpbin.org/post",
-		BearerAuth("some-token"),
-		QueryValue("limit", "10"),
-		BodyJSON(map[string]string{"key": "value"}),
+	req, _ := qst.New(http.MethodPost, "http://bfast.com/api",
+		qst.Scheme("https"),
+		qst.Host("breakfast.com"),
+		qst.Path("/cereals", "1234"),
+		qst.BearerAuth("c0rnfl@k3s"),
+		qst.BodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
 	)
-
-	body, _ := ioutil.ReadAll(req.Body)
 
 	fmt.Println(req.Method)
 	fmt.Println(req.URL)
 	fmt.Println(req.Header.Get("Authorization"))
+	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Println(string(body))
+
+	// Output:
+	// POST
+	// https://breakfast.com/api/cereals/1234
+	// Bearer c0rnfl@k3s
+	// {"name":"Honey Bunches of Oats"}
 }
 
 func ExampleDo() {
-	// Output:
-	// POST
-	// /?limit=10
-	// Bearer some-token
-	// {"key":"value"}
-
-	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
-		body, _ := ioutil.ReadAll(req.Body)
-
-		fmt.Println(req.Method)
-		fmt.Println(req.URL)
-		fmt.Println(req.Header.Get("Authorization"))
+	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.Method)
+		fmt.Println(r.URL)
+		fmt.Println(r.Header.Get("Authorization"))
+		body, _ := ioutil.ReadAll(r.Body)
 		fmt.Println(string(body))
 	}))
 	defer server.Close()
 
-	Do(http.MethodPost, server.URL,
-		BearerAuth("some-token"),
-		QueryValue("limit", "10"),
-		BodyJSON(map[string]string{"key": "value"}),
+	qst.Do(http.MethodPost, server.URL,
+		qst.Path("api", "/cereals", "1234"),
+		qst.BearerAuth("c0rnfl@k3s"),
+		qst.BodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
 	)
+
+	// Output:
+	// POST
+	// /api/cereals/1234
+	// Bearer c0rnfl@k3s
+	// {"name":"Honey Bunches of Oats"}
 }
