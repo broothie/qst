@@ -10,7 +10,7 @@ func New{{ $method }}(url string, options ...Option) (*http.Request, error) {
 	return New(http.Method{{ $method }}, url, options...)
 }
 
-// {{ $method }} makes a {{ $capitalizedMethod }} request using the current DefaultClient and returns the *http.Response.
+// {{ $method }} makes a {{ $capitalizedMethod }} request using Do and returns the *http.Response.
 func {{ $method }}(url string, options ...Option) (*http.Response, error) {
 	return Do(http.Method{{ $method }}, url, options...)
 }

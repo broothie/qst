@@ -237,7 +237,7 @@ func BodyXML(v interface{}) Option {
 	})
 }
 
-// Dump writes the request to `w`.
+// Dump writes the request to w.
 func Dump(w io.Writer) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
 		dump, err := httputil.DumpRequest(request, true)
