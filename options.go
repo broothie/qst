@@ -133,6 +133,26 @@ func (h Headers) Apply(request *http.Request) (*http.Request, error) {
 	return options.Apply(request)
 }
 
+// Accept applies an "Accept" header to the *http.Request.
+func Accept(accept string) Option {
+	return Header("Accept", accept)
+}
+
+// ContentType applies a "Content-Type" to the *http.Request.
+func ContentType(contentType string) Option {
+	return Header("Content-Type", contentType)
+}
+
+// Referer applies a "Referer" header to the *http.Request.
+func Referer(referer string) Option {
+	return Header("Referer", referer)
+}
+
+// UserAgent applies a "User-Agent" header to the *http.Request.
+func UserAgent(userAgent string) Option {
+	return Header("User-Agent", userAgent)
+}
+
 // Cookie applies a cookie to the *http.Request.
 func Cookie(cookie *http.Cookie) Option {
 	return OptionFunc(func(request *http.Request) (*http.Request, error) {
@@ -152,6 +172,11 @@ func BasicAuth(username, password string) Option {
 		request.SetBasicAuth(username, password)
 		return request, nil
 	})
+}
+
+// TokenAuth applies an "Authorization: Token <token>" header to the *http.Request.
+func TokenAuth(token string) Option {
+	return Authorization(fmt.Sprintf("Token %s", token))
 }
 
 // BearerAuth applies an "Authorization: Bearer <token>" header to the *http.Request.
@@ -202,7 +227,7 @@ type BodyForm pkgurl.Values
 // Apply URL-encodes the BodyForm and applies the result to the *http.Request body.
 func (f BodyForm) Apply(request *http.Request) (*http.Request, error) {
 	return Apply(request,
-		Header("Content-Type", "application/x-www-form-urlencoded"),
+		ContentType("application/x-www-form-urlencoded"),
 		BodyString(pkgurl.Values(f).Encode()),
 	)
 }
@@ -216,7 +241,7 @@ func BodyJSON(v interface{}) Option {
 		}
 
 		return Apply(request,
-			Header("Content-Type", "application/json"),
+			ContentType("application/json"),
 			BodyReader(body),
 		)
 	})
@@ -231,7 +256,7 @@ func BodyXML(v interface{}) Option {
 		}
 
 		return Apply(request,
-			Header("Content-Type", "application/xml"),
+			ContentType("application/xml"),
 			BodyReader(body),
 		)
 	})

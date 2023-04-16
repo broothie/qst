@@ -117,6 +117,42 @@ func ExampleHeaders() {
 	// Output: map[Grain:[oats] Style:[toasted]]
 }
 
+func ExampleAccept() {
+	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
+		qst.Accept("application/json"),
+	)
+
+	fmt.Println(request.Header.Get("Accept"))
+	// Output: application/json
+}
+
+func ExampleContentType() {
+	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
+		qst.ContentType("application/json"),
+	)
+
+	fmt.Println(request.Header.Get("Content-Type"))
+	// Output: application/json
+}
+
+func ExampleReferer() {
+	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
+		qst.Referer("https://breakfast.com"),
+	)
+
+	fmt.Println(request.Header.Get("Referer"))
+	// Output: https://breakfast.com
+}
+
+func ExampleUserAgent() {
+	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
+		qst.UserAgent("qst"),
+	)
+
+	fmt.Println(request.Header.Get("User-Agent"))
+	// Output: qst
+}
+
 func ExampleCookie() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
 		qst.Cookie(&http.Cookie{
@@ -147,6 +183,15 @@ func ExampleBasicAuth() {
 
 	fmt.Println(request.Header.Get("Authorization"))
 	// Output: Basic VG9ueVRoZVRpZ2VyOmdycnJlYXQ=
+}
+
+func ExampleTokenAuth() {
+	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
+		qst.TokenAuth("c0rnfl@k3s"),
+	)
+
+	fmt.Println(request.Header.Get("Authorization"))
+	// Output: Token c0rnfl@k3s
 }
 
 func ExampleBearerAuth() {
