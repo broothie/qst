@@ -34,10 +34,10 @@ request, err := qst.NewPatch("https://breakfast.com/api", // New PATCH request
 It can also be used to fire requests:
 
 ```go
-request, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
-    qst.BearerAuth("c0rNfl@k3s"),                      // Authorization header
-    qst.Path("/cereals", cerealID),                    // Query param
-    qst.BodyJSON(map[string]string{"name": "Life"}),   // JSON body
+response, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
+    qst.BearerAuth("c0rNfl@k3s"),                       // Authorization header
+    qst.Path("/cereals", cerealID),                     // Query param
+    qst.BodyJSON(map[string]string{"name": "Life"}),    // JSON body
 )
 ```
 
