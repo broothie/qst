@@ -5,10 +5,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/broothie/option"
 	"github.com/broothie/qst"
 )
 
-func ExampleOptionFunc() {
+func ExampleClient() {
 	token := "c0rnfl@k3s"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -18,8 +19,8 @@ func ExampleOptionFunc() {
 
 	client := qst.NewClient(server.Client(),
 		qst.URL(server.URL),
-		qst.OptionFunc(func(request *http.Request) (*http.Request, error) {
-			return qst.BearerAuth(token).Apply(request)
+		option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+			return qst.BearerAuth(token)(request)
 		}),
 	)
 
