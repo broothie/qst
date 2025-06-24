@@ -44,7 +44,7 @@ response, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
 The options pattern makes it easy to define custom options:
 
 ```go
-func createdSinceYesterday() qst.Option {
+func createdSinceYesterday() option.Option[*http.Request] {
     yesterday := time.Now().Add(-24 * time.Hour)
     return qst.Query("created_at", fmt.Sprintf(">%s", yesterday.Format(time.RFC3339)))
 }
@@ -58,35 +58,25 @@ func main() {
 }
 ```
 
-### qst.Client
+### Creating Default Options
 
-This package also includes a `Client`, which can be outfitted with a set of default options:
-
-```go
-client := qst.NewClient(http.DefaultClient,
-    qst.URL("https://breakfast.com/api"),
-    qst.BearerAuth("c0rNfl@k3s"), 
-)
-
-response, err := client.Patch(
-    // qst.URL("https://breakfast.com/api"), // Not necessary, included via client
-    // qst.BearerAuth("c0rNfl@k3s"),         // Not necessary, included via client
-    qst.Path("/cereals", cerealID),
-    qst.BodyJSON(map[string]interface{}{
-        "name": "Golden Grahams",
-    }),
-)
-```
-
-### qst.OptionFunc
-
-`OptionFunc` can be used to add a custom function which is run during request creation:
+If you need to reuse a set of default options across multiple requests, you can create a function that returns multiple options:
 
 ```go
-client := qst.NewClient(http.DefaultClient,
-    qst.OptionFunc(func(request *http.Request) (*http.Request, error) {
-      token := dynamicallyGetBearerTokenSomehow()
-      return qst.BearerAuth(token).Apply(request)
-    }),
-)
+func myDefaults() option.Option[*http.Request] {
+    return option.NewOptions(
+        qst.URL("https://breakfast.com/api"),
+        qst.BearerAuth("c0rNfl@k3s"),
+    )
+}
+
+func main() {
+    response, err := qst.Patch("https://breakfast.com/api",
+        myDefaults(),
+        qst.Path("/cereals", cerealID),
+        qst.BodyJSON(map[string]interface{}{
+            "name": "Golden Grahams",
+        }),
+    )
+}
 ```

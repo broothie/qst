@@ -1,37 +1,11 @@
 package qst
 
-import (
-	"net/http"
+import "net/http"
 
-	"github.com/broothie/option"
-)
+// client is the global HTTP client used by the Do function.
+var client = http.DefaultClient
 
-// DefaultClient captures the current Doer.
-var DefaultClient = NewClient(http.DefaultClient)
-
-// Doer is typically an *http.Client.
-type Doer interface {
-	Do(*http.Request) (*http.Response, error)
-}
-
-// NewClient creates a new Client.
-func NewClient(doer Doer, options ...option.Option[*http.Request]) *Client {
-	return &Client{doer: doer, options: options}
-}
-
-// Client captures a Doer and Options to apply to every request.
-type Client struct {
-	options []option.Option[*http.Request]
-	doer    Doer
-}
-
-// Do makes an *http.Request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Do(method string, options ...option.Option[*http.Request]) (*http.Response, error) {
-	allOptions := append(c.options, options...)
-	request, err := New(method, "", allOptions...)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.doer.Do(request)
+// SetClient sets the global HTTP client used by the Do function.
+func SetClient(c *http.Client) {
+	client = c
 }

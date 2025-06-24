@@ -1,33 +1,29 @@
 package qst_test
 
 import (
-	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/broothie/qst"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClient_Do(t *testing.T) {
-	_, err := qst.NewClient(http.DefaultClient).Do("lol what")
-	assert.EqualError(t, err, `net/http: invalid method "lol what"`)
-}
+func TestSetClient(t *testing.T) {
+	// Create a custom client with a specific timeout
+	customClient := &http.Client{
+		Timeout: 1 * time.Second,
+	}
 
-func ExampleNewClient() {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.Header.Get("Authorization"))
-		fmt.Println(r.URL.RawQuery)
-	}))
-	defer server.Close()
+	// Set the custom client
+	qst.SetClient(customClient)
 
-	client := qst.NewClient(http.DefaultClient,
-		qst.URL(server.URL),
-		qst.BearerAuth("c0rnfl@k3s"),
-	)
+	// Create a request that would use the custom client
+	// We can't easily test the exact client being used without making an actual request,
+	// but we can at least verify the function doesn't panic
+	_, err := qst.New(http.MethodGet, "https://example.com")
+	assert.NoError(t, err)
 
-	client.Get(qst.Query("page", "10"))
-	// Output: Bearer c0rnfl@k3s
-	// page=10
+	// Reset to default client to avoid affecting other tests
+	qst.SetClient(http.DefaultClient)
 }

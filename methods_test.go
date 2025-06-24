@@ -13,57 +13,46 @@ import (
 
 func TestMethods(t *testing.T) {
 	type testCase struct {
-		new      func(url string, options ...option.Option[*http.Request]) (*http.Request, error)
-		do       func(url string, options ...option.Option[*http.Request]) (*http.Response, error)
-		clientDo func(options ...option.Option[*http.Request]) (*http.Response, error)
+		new func(url string, options ...option.Option[*http.Request]) (*http.Request, error)
+		do  func(url string, options ...option.Option[*http.Request]) (*http.Response, error)
 	}
 
-	client := http.DefaultClient
 	var methods = map[string]testCase{
 		http.MethodGet: {
-			new:      qst.NewGet,
-			do:       qst.Get,
-			clientDo: qst.NewClient(client).Get,
+			new: qst.NewGet,
+			do:  qst.Get,
 		},
 		http.MethodHead: {
-			new:      qst.NewHead,
-			do:       qst.Head,
-			clientDo: qst.NewClient(client).Head,
+			new: qst.NewHead,
+			do:  qst.Head,
 		},
 		http.MethodPost: {
-			new:      qst.NewPost,
-			do:       qst.Post,
-			clientDo: qst.NewClient(client).Post,
+			new: qst.NewPost,
+			do:  qst.Post,
 		},
 		http.MethodPut: {
-			new:      qst.NewPut,
-			do:       qst.Put,
-			clientDo: qst.NewClient(client).Put,
+			new: qst.NewPut,
+			do:  qst.Put,
 		},
 		http.MethodPatch: {
-			new:      qst.NewPatch,
-			do:       qst.Patch,
-			clientDo: qst.NewClient(client).Patch,
+			new: qst.NewPatch,
+			do:  qst.Patch,
 		},
 		http.MethodDelete: {
-			new:      qst.NewDelete,
-			do:       qst.Delete,
-			clientDo: qst.NewClient(client).Delete,
+			new: qst.NewDelete,
+			do:  qst.Delete,
 		},
 		http.MethodConnect: {
-			new:      qst.NewConnect,
-			do:       qst.Connect,
-			clientDo: qst.NewClient(client).Connect,
+			new: qst.NewConnect,
+			do:  qst.Connect,
 		},
 		http.MethodOptions: {
-			new:      qst.NewOptions,
-			do:       qst.Options,
-			clientDo: qst.NewClient(client).Options,
+			new: qst.NewOptions,
+			do:  qst.Options,
 		},
 		http.MethodTrace: {
-			new:      qst.NewTrace,
-			do:       qst.Trace,
-			clientDo: qst.NewClient(client).Trace,
+			new: qst.NewTrace,
+			do:  qst.Trace,
 		},
 	}
 
@@ -82,11 +71,6 @@ func TestMethods(t *testing.T) {
 
 		t.Run("do", func(t *testing.T) {
 			_, err := tc.do(server.URL)
-			require.NoError(t, err)
-		})
-
-		t.Run("clientDo", func(t *testing.T) {
-			_, err := tc.clientDo(qst.URL(server.URL))
 			require.NoError(t, err)
 		})
 

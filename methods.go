@@ -11,14 +11,9 @@ func NewGet(url string, options ...option.Option[*http.Request]) (*http.Request,
 	return New(http.MethodGet, url, options...)
 }
 
-// Get makes a GET request using the current DefaultClient and returns the *http.Response.
+// Get makes a GET request and returns the *http.Response.
 func Get(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodGet, url, options...)
-}
-
-// Get makes a GET request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Get(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodGet, options...)
 }
 
 // NewHead builds a new *http.Request with method HEAD.
@@ -26,14 +21,9 @@ func NewHead(url string, options ...option.Option[*http.Request]) (*http.Request
 	return New(http.MethodHead, url, options...)
 }
 
-// Head makes a HEAD request using the current DefaultClient and returns the *http.Response.
+// Head makes a HEAD request and returns the *http.Response.
 func Head(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodHead, url, options...)
-}
-
-// Head makes a HEAD request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Head(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodHead, options...)
 }
 
 // NewPost builds a new *http.Request with method POST.
@@ -41,14 +31,9 @@ func NewPost(url string, options ...option.Option[*http.Request]) (*http.Request
 	return New(http.MethodPost, url, options...)
 }
 
-// Post makes a POST request using the current DefaultClient and returns the *http.Response.
+// Post makes a POST request and returns the *http.Response.
 func Post(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodPost, url, options...)
-}
-
-// Post makes a POST request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Post(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodPost, options...)
 }
 
 // NewPut builds a new *http.Request with method PUT.
@@ -56,14 +41,9 @@ func NewPut(url string, options ...option.Option[*http.Request]) (*http.Request,
 	return New(http.MethodPut, url, options...)
 }
 
-// Put makes a PUT request using the current DefaultClient and returns the *http.Response.
+// Put makes a PUT request and returns the *http.Response.
 func Put(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodPut, url, options...)
-}
-
-// Put makes a PUT request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Put(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodPut, options...)
 }
 
 // NewPatch builds a new *http.Request with method PATCH.
@@ -71,14 +51,9 @@ func NewPatch(url string, options ...option.Option[*http.Request]) (*http.Reques
 	return New(http.MethodPatch, url, options...)
 }
 
-// Patch makes a PATCH request using the current DefaultClient and returns the *http.Response.
+// Patch makes a PATCH request and returns the *http.Response.
 func Patch(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodPatch, url, options...)
-}
-
-// Patch makes a PATCH request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Patch(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodPatch, options...)
 }
 
 // NewDelete builds a new *http.Request with method DELETE.
@@ -86,14 +61,9 @@ func NewDelete(url string, options ...option.Option[*http.Request]) (*http.Reque
 	return New(http.MethodDelete, url, options...)
 }
 
-// Delete makes a DELETE request using the current DefaultClient and returns the *http.Response.
+// Delete makes a DELETE request and returns the *http.Response.
 func Delete(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodDelete, url, options...)
-}
-
-// Delete makes a DELETE request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Delete(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodDelete, options...)
 }
 
 // NewConnect builds a new *http.Request with method CONNECT.
@@ -101,14 +71,9 @@ func NewConnect(url string, options ...option.Option[*http.Request]) (*http.Requ
 	return New(http.MethodConnect, url, options...)
 }
 
-// Connect makes a CONNECT request using the current DefaultClient and returns the *http.Response.
+// Connect makes a CONNECT request and returns the *http.Response.
 func Connect(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodConnect, url, options...)
-}
-
-// Connect makes a CONNECT request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Connect(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodConnect, options...)
 }
 
 // NewOptions builds a new *http.Request with method OPTIONS.
@@ -116,14 +81,9 @@ func NewOptions(url string, options ...option.Option[*http.Request]) (*http.Requ
 	return New(http.MethodOptions, url, options...)
 }
 
-// Options makes a OPTIONS request using the current DefaultClient and returns the *http.Response.
+// Options makes a OPTIONS request and returns the *http.Response.
 func Options(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodOptions, url, options...)
-}
-
-// Options makes a OPTIONS request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Options(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodOptions, options...)
 }
 
 // NewTrace builds a new *http.Request with method TRACE.
@@ -131,12 +91,7 @@ func NewTrace(url string, options ...option.Option[*http.Request]) (*http.Reques
 	return New(http.MethodTrace, url, options...)
 }
 
-// Trace makes a TRACE request using the current DefaultClient and returns the *http.Response.
+// Trace makes a TRACE request and returns the *http.Response.
 func Trace(url string, options ...option.Option[*http.Request]) (*http.Response, error) {
 	return Do(http.MethodTrace, url, options...)
-}
-
-// Trace makes a TRACE request and returns the *http.Response using the Doer assigned to c.
-func (c *Client) Trace(options ...option.Option[*http.Request]) (*http.Response, error) {
-	return c.Do(http.MethodTrace, options...)
 }
