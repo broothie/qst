@@ -17,17 +17,17 @@ import (
 func TestOptions_errors(t *testing.T) {
 	t.Run("URL error", func(t *testing.T) {
 		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.URL("%"))
-		assert.EqualError(t, err, `parse %: invalid URL escape "%"`)
+		assert.EqualError(t, err, `failed to apply option 0: parse "%": invalid URL escape "%"`)
 	})
 
 	t.Run("BodyJSON error", func(t *testing.T) {
 		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyJSON(make(chan struct{})))
-		assert.EqualError(t, err, "json: unsupported type: chan struct {}")
+		assert.EqualError(t, err, "failed to apply option 0: json: unsupported type: chan struct {}")
 	})
 
 	t.Run("BodyXML error", func(t *testing.T) {
 		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyXML(make(chan struct{})))
-		assert.EqualError(t, err, "xml: unsupported type: chan struct {}")
+		assert.EqualError(t, err, "failed to apply option 0: xml: unsupported type: chan struct {}")
 	})
 
 	t.Run("Dump read error", func(t *testing.T) {
@@ -36,7 +36,7 @@ func TestOptions_errors(t *testing.T) {
 			qst.Dump(os.Stdout),
 		)
 
-		assert.EqualError(t, err, "broken")
+		assert.EqualError(t, err, "failed to apply option 1: broken")
 	})
 
 	t.Run("Dump write error", func(t *testing.T) {
@@ -44,7 +44,7 @@ func TestOptions_errors(t *testing.T) {
 			qst.Dump(broken{}),
 		)
 
-		assert.EqualError(t, err, "broken")
+		assert.EqualError(t, err, "failed to apply option 0: broken")
 	})
 }
 

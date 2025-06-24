@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/broothie/option"
 	"github.com/broothie/qst"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -12,9 +13,9 @@ import (
 
 func TestMethods(t *testing.T) {
 	type testCase struct {
-		new      func(url string, options ...qst.Option) (*http.Request, error)
-		do       func(url string, options ...qst.Option) (*http.Response, error)
-		clientDo func(options ...qst.Option) (*http.Response, error)
+		new      func(url string, options ...option.Option[*http.Request]) (*http.Request, error)
+		do       func(url string, options ...option.Option[*http.Request]) (*http.Response, error)
+		clientDo func(options ...option.Option[*http.Request]) (*http.Response, error)
 	}
 
 	client := http.DefaultClient

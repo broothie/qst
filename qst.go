@@ -1,18 +1,22 @@
 package qst
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/broothie/option"
+)
 
 // New builds a new *http.Request.
-func New(method, url string, options ...Option) (*http.Request, error) {
+func New(method, url string, options ...option.Option[*http.Request]) (*http.Request, error) {
 	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return Apply(request, options...)
+	return option.Apply(request, options...)
 }
 
 // Do makes an *http.Request using the current DefaultClient and returns the *http.Response.
-func Do(method, url string, options ...Option) (*http.Response, error) {
-	return DefaultClient.Do(method, Pipeline{URL(url)}.With(options...)...)
+func Do(method, url string, options ...option.Option[*http.Request]) (*http.Response, error) {
+	return DefaultClient.Do(method, append(option.Options[*http.Request]{URL(url)}, options...)...)
 }

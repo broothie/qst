@@ -17,8 +17,6 @@ go get github.com/broothie/qst
 
 Detailed documentation can be found at [pkg.go.dev](https://pkg.go.dev/github.com/broothie/qst).
 
-A list of all available options can be found [here](https://pkg.go.dev/github.com/broothie/qst#Option).
-
 ## Usage
 
 `qst` uses an options pattern to build `*http.Request` objects:
@@ -44,7 +42,7 @@ response, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
 The options pattern makes it easy to define custom options:
 
 ```go
-func createdSinceYesterday() qst.Option {
+func createdSinceYesterday() option.Option[*http.Request] {
     yesterday := time.Now().Add(-24 * time.Hour)
     return qst.Query("created_at", fmt.Sprintf(">%s", yesterday.Format(time.RFC3339)))
 }
@@ -78,13 +76,13 @@ response, err := client.Patch(
 )
 ```
 
-### qst.OptionFunc
+### option.Func
 
-`OptionFunc` can be used to add a custom function which is run during request creation:
+`option.Func` can be used to add a custom function which is run during request creation:
 
 ```go
 client := qst.NewClient(http.DefaultClient,
-    qst.OptionFunc(func(request *http.Request) (*http.Request, error) {
+    option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
       token := dynamicallyGetBearerTokenSomehow()
       return qst.BearerAuth(token).Apply(request)
     }),
