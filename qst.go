@@ -16,9 +16,12 @@ func New(method, url string, options ...option.Option[*http.Request]) (*http.Req
 	return option.Apply(request, options...)
 }
 
-// Do makes an *http.Request using the current DefaultClient and returns the *http.Response.
+// Do makes an *http.Request using http.DefaultClient and returns the *http.Response.
 func Do(method, url string, options ...option.Option[*http.Request]) (*http.Response, error) {
-	urlOptions := []option.Option[*http.Request]{URL(url)}
-	allOptions := append(urlOptions, options...)
-	return DefaultClient.Do(method, allOptions...)
+	request, err := New(method, url, options...)
+	if err != nil {
+		return nil, err
+	}
+
+	return http.DefaultClient.Do(request)
 }
