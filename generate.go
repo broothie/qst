@@ -1,3 +1,3 @@
 package qst
 
-//go:generate go run methods.generate.go
+//go:generate go run ./cmd/generate/methods

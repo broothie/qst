@@ -1,10 +1,13 @@
 module github.com/broothie/qst
 
-go 1.19
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/broothie/option v0.1.0
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/text v0.26.0
 )
 
 require (
