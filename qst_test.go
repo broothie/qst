@@ -20,11 +20,11 @@ func TestNew(t *testing.T) {
 
 func ExampleNew() {
 	req, _ := qst.New(http.MethodPost, "http://bfast.com/api",
-		qst.Scheme("https"),
-		qst.Host("breakfast.com"),
-		qst.Path("/cereals", "1234"),
-		qst.BearerAuth("c0rnfl@k3s"),
-		qst.BodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
+		qst.WithScheme("https"),
+		qst.WithHost("breakfast.com"),
+		qst.WithPath("/cereals", "1234"),
+		qst.WithBearerAuth("c0rnfl@k3s"),
+		qst.WithBodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
 	)
 
 	fmt.Println(req.Method)
@@ -51,9 +51,9 @@ func ExampleDo() {
 	defer server.Close()
 
 	qst.Do(http.MethodPost, server.URL,
-		qst.Path("api", "/cereals", "1234"),
-		qst.BearerAuth("c0rnfl@k3s"),
-		qst.BodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
+		qst.WithPath("api", "/cereals", "1234"),
+		qst.WithBearerAuth("c0rnfl@k3s"),
+		qst.WithBodyJSON(map[string]string{"name": "Honey Bunches of Oats"}),
 	)
 
 	// Output:

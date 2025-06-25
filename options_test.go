@@ -16,24 +16,24 @@ import (
 
 func TestOptions_errors(t *testing.T) {
 	t.Run("URL error", func(t *testing.T) {
-		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.URL("%"))
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.WithURL("%"))
 		assert.EqualError(t, err, `failed to apply option 0: parse "%": invalid URL escape "%"`)
 	})
 
 	t.Run("BodyJSON error", func(t *testing.T) {
-		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyJSON(make(chan struct{})))
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.WithBodyJSON(make(chan struct{})))
 		assert.EqualError(t, err, "failed to apply option 0: json: unsupported type: chan struct {}")
 	})
 
 	t.Run("BodyXML error", func(t *testing.T) {
-		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.BodyXML(make(chan struct{})))
+		_, err := qst.NewPost("https://breakfast.com/api/cereals", qst.WithBodyXML(make(chan struct{})))
 		assert.EqualError(t, err, "failed to apply option 0: xml: unsupported type: chan struct {}")
 	})
 
 	t.Run("Dump read error", func(t *testing.T) {
 		_, err := qst.NewGet("https://breakfast.com/api/cereals",
-			qst.BodyReader(broken{}),
-			qst.Dump(os.Stdout),
+			qst.WithBodyReader(broken{}),
+			qst.WithDump(os.Stdout),
 		)
 
 		assert.EqualError(t, err, "failed to apply option 1: broken")
@@ -41,52 +41,52 @@ func TestOptions_errors(t *testing.T) {
 
 	t.Run("Dump write error", func(t *testing.T) {
 		_, err := qst.NewGet("https://breakfast.com/api/cereals",
-			qst.Dump(broken{}),
+			qst.WithDump(broken{}),
 		)
 
 		assert.EqualError(t, err, "failed to apply option 0: broken")
 	})
 }
 
-func ExamplePath() {
+func ExampleWithPath() {
 	request, _ := qst.NewGet("https://breakfast.com/api/",
-		qst.Path("/cereals", "1234/variants", "frosted"),
+		qst.WithPath("/cereals", "1234/variants", "frosted"),
 	)
 
 	fmt.Println(request.URL.Path)
 	// Output: /api/cereals/1234/variants/frosted
 }
 
-func ExampleUsername() {
+func ExampleWithUsername() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Username("TonyTheTiger"),
+		qst.WithUsername("TonyTheTiger"),
 	)
 
 	fmt.Println(request.URL)
 	// Output: https://TonyTheTiger@breakfast.com/api/cereals
 }
 
-func ExampleUserPassword() {
+func ExampleWithUserPassword() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.UserPassword("TonyTheTiger", "grrreat"),
+		qst.WithUserPassword("TonyTheTiger", "grrreat"),
 	)
 
 	fmt.Println(request.URL)
 	// Output: https://TonyTheTiger:grrreat@breakfast.com/api/cereals
 }
 
-func ExampleQuery() {
+func ExampleWithQuery() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Query("page", "10"),
+		qst.WithQuery("page", "10"),
 	)
 
 	fmt.Println(request.URL.Query().Encode())
 	// Output: page=10
 }
 
-func ExampleQueries() {
+func ExampleWithQueries() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Queries{
+		qst.WithQueries{
 			"page":  {"10"},
 			"limit": {"50"},
 		},
@@ -96,18 +96,18 @@ func ExampleQueries() {
 	// Output: limit=50&page=10
 }
 
-func ExampleHeader() {
+func ExampleWithHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Header("grain", "oats"),
+		qst.WithHeader("grain", "oats"),
 	)
 
 	fmt.Println(request.Header.Get("grain"))
 	// Output: oats
 }
 
-func ExampleHeaders() {
+func ExampleWithHeaders() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Headers{
+		qst.WithHeaders{
 			"grain": {"oats"},
 			"style": {"toasted"},
 		},
@@ -117,45 +117,45 @@ func ExampleHeaders() {
 	// Output: map[Grain:[oats] Style:[toasted]]
 }
 
-func ExampleAccept() {
+func ExampleWithAccept() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Accept("application/json"),
+		qst.WithAccept("application/json"),
 	)
 
 	fmt.Println(request.Header.Get("Accept"))
 	// Output: application/json
 }
 
-func ExampleContentType() {
+func ExampleWithContentType() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.ContentType("application/json"),
+		qst.WithContentType("application/json"),
 	)
 
 	fmt.Println(request.Header.Get("Content-Type"))
 	// Output: application/json
 }
 
-func ExampleReferer() {
+func ExampleWithReferer() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Referer("https://breakfast.com"),
+		qst.WithReferer("https://breakfast.com"),
 	)
 
 	fmt.Println(request.Header.Get("Referer"))
 	// Output: https://breakfast.com
 }
 
-func ExampleUserAgent() {
+func ExampleWithUserAgent() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.UserAgent("qst"),
+		qst.WithUserAgent("qst"),
 	)
 
 	fmt.Println(request.Header.Get("User-Agent"))
 	// Output: qst
 }
 
-func ExampleCookie() {
+func ExampleWithCookie() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Cookie(&http.Cookie{
+		qst.WithCookie(&http.Cookie{
 			Name:    "cookie-crisp",
 			Value:   "COOOOKIE CRISP!",
 			Path:    "/",
@@ -167,54 +167,54 @@ func ExampleCookie() {
 	// Output: cookie-crisp="COOOOKIE CRISP!" <nil>
 }
 
-func ExampleAuthorization() {
+func ExampleWithAuthorization() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.Authorization("c0rnfl@k3s"),
+		qst.WithAuthorization("c0rnfl@k3s"),
 	)
 
 	fmt.Println(request.Header.Get("Authorization"))
 	// Output: c0rnfl@k3s
 }
 
-func ExampleBasicAuth() {
+func ExampleWithBasicAuth() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.BasicAuth("TonyTheTiger", "grrreat"),
+		qst.WithBasicAuth("TonyTheTiger", "grrreat"),
 	)
 
 	fmt.Println(request.Header.Get("Authorization"))
 	// Output: Basic VG9ueVRoZVRpZ2VyOmdycnJlYXQ=
 }
 
-func ExampleTokenAuth() {
+func ExampleWithTokenAuth() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.TokenAuth("c0rnfl@k3s"),
+		qst.WithTokenAuth("c0rnfl@k3s"),
 	)
 
 	fmt.Println(request.Header.Get("Authorization"))
 	// Output: Token c0rnfl@k3s
 }
 
-func ExampleBearerAuth() {
+func ExampleWithBearerAuth() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.BearerAuth("c0rnfl@k3s"),
+		qst.WithBearerAuth("c0rnfl@k3s"),
 	)
 
 	fmt.Println(request.Header.Get("Authorization"))
 	// Output: Bearer c0rnfl@k3s
 }
 
-func ExampleContextValue() {
+func ExampleWithContextValue() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.ContextValue("frosted", true),
+		qst.WithContextValue("frosted", true),
 	)
 
 	fmt.Println(request.Context().Value("frosted"))
 	// Output: true
 }
 
-func ExampleBody() {
+func ExampleWithBody() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.Body(ioutil.NopCloser(bytes.NewBufferString("Part of a complete breakfast."))),
+		qst.WithBody(ioutil.NopCloser(bytes.NewBufferString("Part of a complete breakfast."))),
 	)
 
 	body, _ := ioutil.ReadAll(request.Body)
@@ -222,9 +222,9 @@ func ExampleBody() {
 	// Output: Part of a complete breakfast.
 }
 
-func ExampleBodyBytes() {
+func ExampleWithBodyBytes() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.BodyBytes([]byte("Part of a complete breakfast.")),
+		qst.WithBodyBytes([]byte("Part of a complete breakfast.")),
 	)
 
 	body, _ := ioutil.ReadAll(request.Body)
@@ -232,9 +232,9 @@ func ExampleBodyBytes() {
 	// Output: Part of a complete breakfast.
 }
 
-func ExampleBodyString() {
+func ExampleWithBodyString() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.BodyString("Part of a complete breakfast."),
+		qst.WithBodyString("Part of a complete breakfast."),
 	)
 
 	body, _ := ioutil.ReadAll(request.Body)
@@ -242,9 +242,9 @@ func ExampleBodyString() {
 	// Output: Part of a complete breakfast.
 }
 
-func ExampleBodyForm() {
+func ExampleWithBodyForm() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.BodyForm{"name": {"Grape Nuts"}},
+		qst.WithBodyForm{"name": {"Grape Nuts"}},
 	)
 
 	body, _ := ioutil.ReadAll(request.Body)
@@ -252,9 +252,9 @@ func ExampleBodyForm() {
 	// Output: name=Grape+Nuts
 }
 
-func ExampleBodyJSON() {
+func ExampleWithBodyJSON() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.BodyJSON(map[string]string{"name": "Rice Krispies"}),
+		qst.WithBodyJSON(map[string]string{"name": "Rice Krispies"}),
 	)
 
 	body, _ := ioutil.ReadAll(request.Body)
@@ -262,9 +262,9 @@ func ExampleBodyJSON() {
 	// Output: {"name":"Rice Krispies"}
 }
 
-func ExampleBodyXML() {
+func ExampleWithBodyXML() {
 	request, _ := qst.NewPost("https://breakfast.com/api/cereals",
-		qst.BodyXML("Part of a complete breakfast."),
+		qst.WithBodyXML("Part of a complete breakfast."),
 	)
 	body, _ := ioutil.ReadAll(request.Body)
 	fmt.Println(string(body))
@@ -274,8 +274,8 @@ func ExampleBodyXML() {
 func TestDump(t *testing.T) {
 	var buffer bytes.Buffer
 	qst.NewGet("https://breakfast.com/api/cereals",
-		qst.BodyString("Part of a complete breakfast."),
-		qst.Dump(&buffer),
+		qst.WithBodyString("Part of a complete breakfast."),
+		qst.WithDump(&buffer),
 	)
 
 	expected := "" +
