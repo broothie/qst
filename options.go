@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/http/httputil"
 	pkgurl "net/url"
@@ -261,6 +262,133 @@ func BodyXML(v interface{}) option.Option[*http.Request] {
 			ContentType("application/xml"),
 			BodyReader(body),
 		)
+	})
+}
+
+// MultipartForm applies a *multipart.Form to the *http.Request.
+func MultipartForm(form *multipart.Form) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.MultipartForm = form
+		return request, nil
+	})
+}
+
+// MultipartFormValue adds a form value to the *http.Request MultipartForm.
+func MultipartFormValue(key, value string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		if request.MultipartForm == nil {
+			request.MultipartForm = &multipart.Form{
+				Value: make(map[string][]string),
+				File:  make(map[string][]*multipart.FileHeader),
+			}
+		}
+		
+		if request.MultipartForm.Value == nil {
+			request.MultipartForm.Value = make(map[string][]string)
+		}
+		
+		request.MultipartForm.Value[key] = append(request.MultipartForm.Value[key], value)
+		return request, nil
+	})
+}
+
+// MultipartFormFile adds a file to the *http.Request MultipartForm.
+func MultipartFormFile(key string, fileHeader *multipart.FileHeader) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		if request.MultipartForm == nil {
+			request.MultipartForm = &multipart.Form{
+				Value: make(map[string][]string),
+				File:  make(map[string][]*multipart.FileHeader),
+			}
+		}
+		
+		if request.MultipartForm.File == nil {
+			request.MultipartForm.File = make(map[string][]*multipart.FileHeader)
+		}
+		
+		request.MultipartForm.File[key] = append(request.MultipartForm.File[key], fileHeader)
+		return request, nil
+	})
+}
+
+// Form applies url.Values to the *http.Request Form field.
+func Form(form pkgurl.Values) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.Form = form
+		return request, nil
+	})
+}
+
+// PostForm applies url.Values to the *http.Request PostForm field.
+func PostForm(form pkgurl.Values) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.PostForm = form
+		return request, nil
+	})
+}
+
+// FormValue adds a key/value pair to the *http.Request Form field.
+func FormValue(key, value string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		if request.Form == nil {
+			request.Form = make(pkgurl.Values)
+		}
+		request.Form.Add(key, value)
+		return request, nil
+	})
+}
+
+// PostFormValue adds a key/value pair to the *http.Request PostForm field.
+func PostFormValue(key, value string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		if request.PostForm == nil {
+			request.PostForm = make(pkgurl.Values)
+		}
+		request.PostForm.Add(key, value)
+		return request, nil
+	})
+}
+
+// Trailer applies http.Header to the *http.Request Trailer field.
+func Trailer(trailer http.Header) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.Trailer = trailer
+		return request, nil
+	})
+}
+
+// TrailerHeader adds a key/value pair to the *http.Request Trailer field.
+func TrailerHeader(key, value string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		if request.Trailer == nil {
+			request.Trailer = make(http.Header)
+		}
+		request.Trailer.Add(key, value)
+		return request, nil
+	})
+}
+
+// TransferEncoding applies a slice of transfer encodings to the *http.Request.
+func TransferEncoding(encodings []string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.TransferEncoding = encodings
+		return request, nil
+	})
+}
+
+// TransferEncodingAppend appends a transfer encoding to the *http.Request TransferEncoding field.
+func TransferEncodingAppend(encoding string) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.TransferEncoding = append(request.TransferEncoding, encoding)
+		return request, nil
+	})
+}
+
+// GetBody applies a GetBody function to the *http.Request.
+func GetBody(getBody func() (io.ReadCloser, error)) option.Option[*http.Request] {
+	return option.Func[*http.Request](func(request *http.Request) (*http.Request, error) {
+		request.GetBody = getBody
+		return request, nil
 	})
 }
 
