@@ -25,9 +25,9 @@ A list of all available options can be found [here](https://pkg.go.dev/github.co
 
 ```go
 request, err := qst.NewPatch("https://breakfast.com/api", // New PATCH request
-    qst.BearerAuth("c0rNfl@k3s"),                         // Authorization header
-    qst.Path("/cereals", cerealID),                       // Query param
-    qst.BodyJSON(map[string]string{"name": "Life"}),      // JSON body
+    qst.WithBearerAuth("c0rNfl@k3s"),                         // Authorization header
+    qst.WithPath("/cereals", cerealID),                       // Query param
+    qst.WithBodyJSON(map[string]string{"name": "Life"}),      // JSON body
 )
 ```
 
@@ -35,9 +35,9 @@ It can also be used to fire requests:
 
 ```go
 response, err := qst.Patch("https://breakfast.com/api", // Send PATCH request
-    qst.BearerAuth("c0rNfl@k3s"),                       // Authorization header
-    qst.Path("/cereals", cerealID),                     // Query param
-    qst.BodyJSON(map[string]string{"name": "Life"}),    // JSON body
+    qst.WithBearerAuth("c0rNfl@k3s"),                       // Authorization header
+    qst.WithPath("/cereals", cerealID),                     // Query param
+    qst.WithBodyJSON(map[string]string{"name": "Life"}),    // JSON body
 )
 ```
 
@@ -46,13 +46,13 @@ The options pattern makes it easy to define custom options:
 ```go
 func createdSinceYesterday() option.Option[*http.Request] {
     yesterday := time.Now().Add(-24 * time.Hour)
-    return qst.Query("created_at", fmt.Sprintf(">%s", yesterday.Format(time.RFC3339)))
+    return qst.WithQuery("created_at", fmt.Sprintf(">%s", yesterday.Format(time.RFC3339)))
 }
 
 func main() {
     response, err := qst.Get("https://breakfast.com/api",
-        qst.BearerAuth("c0rNfl@k3s"),
-        qst.Path("/cereals"),
+        qst.WithBearerAuth("c0rNfl@k3s"),
+        qst.WithPath("/cereals"),
         createdSinceYesterday(),
     )
 }
@@ -65,16 +65,16 @@ If you need to reuse a set of default options across multiple requests, you can 
 ```go
 func myDefaults() option.Option[*http.Request] {
     return option.NewOptions(
-        qst.URL("https://breakfast.com/api"),
-        qst.BearerAuth("c0rNfl@k3s"),
+        qst.WithURL("https://breakfast.com/api"),
+        qst.WithBearerAuth("c0rNfl@k3s"),
     )
 }
 
 func main() {
     response, err := qst.Patch("https://breakfast.com/api",
         myDefaults(),
-        qst.Path("/cereals", cerealID),
-        qst.BodyJSON(map[string]interface{}{
+        qst.WithPath("/cereals", cerealID),
+        qst.WithBodyJSON(map[string]interface{}{
             "name": "Golden Grahams",
         }),
     )

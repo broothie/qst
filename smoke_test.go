@@ -24,8 +24,8 @@ func TestSmoke(t *testing.T) {
 
 		// Exercise
 		_, err := qst.Post(server.URL,
-			qst.BearerAuth("c0rnfl@k3s"),
-			qst.Header("grain", "oats"),
+			qst.WithBearerAuth("c0rnfl@k3s"),
+			qst.WithHeader("grain", "oats"),
 		)
 
 		require.NoError(t, err)
@@ -48,8 +48,8 @@ func TestSmoke(t *testing.T) {
 
 		// Exercise
 		_, err := qst.Post(server.URL,
-			qst.BearerAuth("c0rnfl@k3s"),
-			qst.BodyJSON(map[string]interface{}{"name": "Raisin Bran Crunch", "raisins": true}),
+			qst.WithBearerAuth("c0rnfl@k3s"),
+			qst.WithBodyJSON(map[string]interface{}{"name": "Raisin Bran Crunch", "raisins": true}),
 		)
 		require.NoError(t, err)
 	})
