@@ -135,23 +135,23 @@ func (h WithHeaders) Apply(request *http.Request) (*http.Request, error) {
 	return option.Apply(request, options...)
 }
 
-// WithAccept applies an "Accept" header to the *http.Request.
-func WithAccept(accept string) option.Option[*http.Request] {
+// WithAcceptHeader applies an "Accept" header to the *http.Request.
+func WithAcceptHeader(accept string) option.Option[*http.Request] {
 	return WithHeader("Accept", accept)
 }
 
-// WithContentType applies a "Content-Type" to the *http.Request.
-func WithContentType(contentType string) option.Option[*http.Request] {
+// WithContentTypeHeader applies a "Content-Type" to the *http.Request.
+func WithContentTypeHeader(contentType string) option.Option[*http.Request] {
 	return WithHeader("Content-Type", contentType)
 }
 
-// WithReferer applies a "Referer" header to the *http.Request.
-func WithReferer(referer string) option.Option[*http.Request] {
+// WithRefererHeader applies a "Referer" header to the *http.Request.
+func WithRefererHeader(referer string) option.Option[*http.Request] {
 	return WithHeader("Referer", referer)
 }
 
-// WithUserAgent applies a "User-Agent" header to the *http.Request.
-func WithUserAgent(userAgent string) option.Option[*http.Request] {
+// WithUserAgentHeader applies a "User-Agent" header to the *http.Request.
+func WithUserAgentHeader(userAgent string) option.Option[*http.Request] {
 	return WithHeader("User-Agent", userAgent)
 }
 
@@ -163,8 +163,8 @@ func WithCookie(cookie *http.Cookie) option.Option[*http.Request] {
 	})
 }
 
-// WithAuthorization applies an "Authorization" header to the *http.Request.
-func WithAuthorization(authorization string) option.Option[*http.Request] {
+// WithAuthorizationHeader applies an "Authorization" header to the *http.Request.
+func WithAuthorizationHeader(authorization string) option.Option[*http.Request] {
 	return WithHeader("Authorization", authorization)
 }
 
@@ -178,12 +178,12 @@ func WithBasicAuth(username, password string) option.Option[*http.Request] {
 
 // WithTokenAuth applies an "Authorization: Token <token>" header to the *http.Request.
 func WithTokenAuth(token string) option.Option[*http.Request] {
-	return WithAuthorization(fmt.Sprintf("Token %s", token))
+	return WithAuthorizationHeader(fmt.Sprintf("Token %s", token))
 }
 
 // WithBearerAuth applies an "Authorization: Bearer <token>" header to the *http.Request.
 func WithBearerAuth(token string) option.Option[*http.Request] {
-	return WithAuthorization(fmt.Sprintf("Bearer %s", token))
+	return WithAuthorizationHeader(fmt.Sprintf("Bearer %s", token))
 }
 
 // WithContext applies a context.Context to the *http.Request.
@@ -229,7 +229,7 @@ type WithBodyForm pkgurl.Values
 // Apply URL-encodes the WithBodyForm and applies the result to the *http.Request body.
 func (f WithBodyForm) Apply(request *http.Request) (*http.Request, error) {
 	return option.Apply(request,
-		WithContentType("application/x-www-form-urlencoded"),
+		WithContentTypeHeader("application/x-www-form-urlencoded"),
 		WithBodyString(pkgurl.Values(f).Encode()),
 	)
 }
@@ -243,7 +243,7 @@ func WithBodyJSON(v interface{}) option.Option[*http.Request] {
 		}
 
 		return option.Apply(request,
-			WithContentType("application/json"),
+			WithContentTypeHeader("application/json"),
 			WithBodyReader(body),
 		)
 	})
@@ -258,7 +258,7 @@ func WithBodyXML(v interface{}) option.Option[*http.Request] {
 		}
 
 		return option.Apply(request,
-			WithContentType("application/xml"),
+			WithContentTypeHeader("application/xml"),
 			WithBodyReader(body),
 		)
 	})

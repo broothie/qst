@@ -117,36 +117,36 @@ func ExampleWithHeaders() {
 	// Output: map[Grain:[oats] Style:[toasted]]
 }
 
-func ExampleWithAccept() {
+func ExampleWithAcceptHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.WithAccept("application/json"),
+		qst.WithAcceptHeader("application/json"),
 	)
 
 	fmt.Println(request.Header.Get("Accept"))
 	// Output: application/json
 }
 
-func ExampleWithContentType() {
+func ExampleWithContentTypeHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.WithContentType("application/json"),
+		qst.WithContentTypeHeader("application/json"),
 	)
 
 	fmt.Println(request.Header.Get("Content-Type"))
 	// Output: application/json
 }
 
-func ExampleWithReferer() {
+func ExampleWithRefererHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.WithReferer("https://breakfast.com"),
+		qst.WithRefererHeader("https://breakfast.com"),
 	)
 
 	fmt.Println(request.Header.Get("Referer"))
 	// Output: https://breakfast.com
 }
 
-func ExampleWithUserAgent() {
+func ExampleWithUserAgentHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.WithUserAgent("qst"),
+		qst.WithUserAgentHeader("qst"),
 	)
 
 	fmt.Println(request.Header.Get("User-Agent"))
@@ -167,9 +167,9 @@ func ExampleWithCookie() {
 	// Output: cookie-crisp="COOOOKIE CRISP!" <nil>
 }
 
-func ExampleWithAuthorization() {
+func ExampleWithAuthorizationHeader() {
 	request, _ := qst.NewGet("https://breakfast.com/api/cereals",
-		qst.WithAuthorization("c0rnfl@k3s"),
+		qst.WithAuthorizationHeader("c0rnfl@k3s"),
 	)
 
 	fmt.Println(request.Header.Get("Authorization"))
