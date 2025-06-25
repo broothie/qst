@@ -10,7 +10,10 @@ import (
 	"text/template"
 )
 
-const templateName = "methods.go.tmpl"
+const (
+	fileName     = "methods.go"
+	templateName = "methods.go.tmpl"
+)
 
 //go:embed methods.go.tmpl
 var templateFile string
@@ -55,7 +58,7 @@ func main() {
 }
 
 func run() (err error) {
-	methodsGo, err := os.Create("methods.go")
+	methodsGo, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
