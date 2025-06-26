@@ -1,6 +1,6 @@
 module github.com/broothie/qst
 
-go 1.19
+go 1.20
 
 require (
 	github.com/broothie/option v0.1.0
