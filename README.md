@@ -80,3 +80,123 @@ func main() {
     )
 }
 ```
+
+## All Available Options
+
+```go
+request, err := qst.New(
+    // Use a *url.URL
+    qst.WithRawURL(parsedURL),
+
+    // Use a URL string
+    qst.WithURL("https://api.example.com"),
+
+    // Set scheme
+    qst.WithScheme("https"),
+
+    // Set host
+    qst.WithHost("api.example.com"),
+
+    // Build path from segments
+    qst.WithPath("/users", userID, "/posts"),
+
+    // Use *url.Userinfo
+    qst.WithUser(userInfo),
+
+    // Username only
+    qst.WithUsername("admin"),
+
+    // Username and password
+    qst.WithUserPassword("admin", "secret"),
+
+    // Single query param
+    qst.WithQuery("page", "1"),
+
+    // Multiple query params
+    qst.WithQueries(qst.Queries{
+        "page":  {"1"},
+        "limit": {"10"},
+    }),
+
+    // Single header
+    qst.WithHeader("X-API-Key", "secret"),
+
+    // Multiple headers
+    qst.WithHeaders(qst.Headers{
+        "X-API-Key":    {"secret"},
+        "X-Client-ID":  {"app123"},
+    }),
+
+    // Accept header
+    qst.WithAcceptHeader("application/json"),
+
+    // Content-Type header
+    qst.WithContentTypeHeader("application/xml"),
+
+    // Referer header
+    qst.WithRefererHeader("https://example.com"),
+
+    // User-Agent header
+    qst.WithUserAgentHeader("MyApp/1.0"),
+
+    // Authorization header
+    qst.WithAuthorizationHeader("Custom token"),
+
+    // Basic auth
+    qst.WithBasicAuth("user", "pass"),
+
+    // Token auth
+    qst.WithTokenAuth("abc123"),
+
+    // Bearer token
+    qst.WithBearerAuth("jwt_token_here"),
+
+    // Add cookie
+    qst.WithCookie(&http.Cookie{
+        Name:  "session",
+        Value: "abc123",
+    }),
+
+    // Set context
+    qst.WithContext(ctx),
+
+    // Add context value
+    qst.WithContextValue("userID", 123),
+
+    // io.ReadCloser
+    qst.WithBody(readCloser),
+
+    // io.Reader
+    qst.WithBodyReader(reader),
+
+    // Byte slice
+    qst.WithBodyBytes([]byte("data")),
+
+    // String
+    qst.WithBodyString("plain text"),
+
+    // URL-encoded form
+    qst.WithBodyForm(qst.Form{
+        "username": {"john"},
+        "email":    {"john@example.com"},
+    }),
+
+    // JSON body
+    qst.WithBodyJSON(map[string]interface{}{
+        "name": "John",
+        "age":  30,
+    }),
+
+    // XML body
+    qst.WithBodyXML(struct{
+        Name string `xml:"name"`
+        Age  int    `xml:"age"`
+    }{
+        Name: "John",
+        Age:  30,
+    }),
+
+    // Dump request to writer
+    qst.WithDump(os.Stdout),
+)
+```
