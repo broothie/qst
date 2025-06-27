@@ -58,25 +58,13 @@ func main() {
 }
 ```
 
-### Creating Default Options
-
-If you need to reuse a set of default options across multiple requests, you can create a function that returns multiple options:
+You can also combine multiple options using `option.NewOptions()` to create reusable defaults:
 
 ```go
 func myDefaults() option.Option[*http.Request] {
     return option.NewOptions(
         qst.WithURL("https://breakfast.com/api"),
         qst.WithBearerAuth("c0rNfl@k3s"),
-    )
-}
-
-func main() {
-    response, err := qst.Patch("https://breakfast.com/api",
-        myDefaults(),
-        qst.WithPath("/cereals", cerealID),
-        qst.WithBodyJSON(map[string]interface{}{
-            "name": "Golden Grahams",
-        }),
     )
 }
 ```
